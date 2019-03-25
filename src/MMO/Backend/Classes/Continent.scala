@@ -1,4 +1,4 @@
-package MMO.Classes
+package MMO.Backend.Classes
 
 abstract class Continent(var Money: Int, var Troops: Int, var Resources: Int, var GrowthRates: Map[String, Int]) {
 
