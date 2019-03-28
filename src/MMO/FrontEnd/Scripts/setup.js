@@ -57,11 +57,14 @@ function setup() {
 
     var GUI = TextureCache["textures/GUI.png"];
     var map_rect = new Texture(GUI, new Rectangle(0, 0, 250, 250));
-    var chat_rect = new Texture(GUI, new Rectangle(250, 0, 250, 250));
+    var continentSelection_rect = new Texture(GUI, new Rectangle(250, 0, 250, 250));
     var profile_rect = new Texture(GUI, new Rectangle(500, 0, 250, 250));
     var gold_stat_rect = new Texture(GUI, new Rectangle(750, 0, 250, 250));
     var military_stat_rect = new Texture(GUI, new Rectangle(1000, 0, 250, 250));
     var agriculture_stat_rect = new Texture(GUI, new Rectangle(1250, 0, 250, 250));
+    var pressAttack_rect = new Texture(GUI, new Rectangle(1500, 0, 250, 250));
+    var pressDefend_rect = new Texture(GUI, new Rectangle(1750, 0, 250, 250));
+
 
     var TILEMAP_component = new Container();
     var GUI_component = new Container();
@@ -117,16 +120,41 @@ function setup() {
     agriculture_magnitude.style.fontFamily = "Times New Roman";
     GUI_component.addChild(agriculture_magnitude);
 
-    var chat = new Sprite(chat_rect);
-    chat.interactive = true;
-    chat.buttonMode = true;
-    chat.position.set(GUIborder[0]+380, GUIborder[1]+590);
-    chat.width = 400;
-    chat.height = 80;
-    chat.on("click", ()=> {
-        console.log("chat enabled")
+    var continentSelection = new Sprite(continentSelection_rect);
+    continentSelection.interactive = true;
+    continentSelection.buttonMode = true;
+    continentSelection.position.set(GUIborder[0]+445, GUIborder[1]+560);
+    continentSelection.width =  335;
+    continentSelection.height = 120;
+    continentSelection.on("click", ()=> {
+        $.get("index.css", function(data) {
+            console.log(data);
+        });
     });
-    GUI_component.addChild(chat);
+    GUI_component.addChild(continentSelection);
+
+    var pressAttack = new Sprite(pressAttack_rect);
+    pressAttack.interactive = true;
+    pressAttack.buttonMode = true;
+    pressAttack.position.set(GUIborder[0]+380, GUIborder[1]+560);
+    pressAttack.width = 60;
+    pressAttack.height = 60;
+    pressAttack.on("click", ()=> {
+        console.log("Attack")
+    });
+    GUI_component.addChild(pressAttack);
+
+    var pressDefend = new Sprite(pressDefend_rect);
+    pressDefend.interactive = true;
+    pressDefend.buttonMode = true;
+    pressDefend.position.set(GUIborder[0]+380, GUIborder[1]+620);
+    pressDefend.width = 60;
+    pressDefend.height = 60;
+    pressDefend.on("click", ()=> {
+        console.log("Defend")
+    });
+    GUI_component.addChild(pressDefend);
+
 
     var map = new Sprite(map_rect);
     map.position.set(GUIborder[0]+790, GUIborder[1]+465);
@@ -225,7 +253,6 @@ function setup() {
             row_counter+=1;
         }
     }
-    // continentMapping(TILEMAP_component, GUIborder, 15, 0xedebe6, 0, 0);
     continentMapping(TILEMAP_component, GUIborder, 60, 0xedebe6, 0, 0);
 
     continentMapping(GUI_component, MAPborder, 5, 0x9b9992, 0, 0);
@@ -277,7 +304,7 @@ function setup() {
 
         });
     }
-    scrollMap();
+    // scrollMap();
 
     /********************************** preliminary setup for gameloop ************************************************************/
     var state = play; // initial state is "play"
