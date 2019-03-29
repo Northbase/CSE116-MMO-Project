@@ -127,7 +127,7 @@ function setup() {
     continentSelection.width =  335;
     continentSelection.height = 120;
     continentSelection.on("click", ()=> {
-        $.get("index.css", function(data) {
+        $.get("sample.json", function(data) {
             console.log(data);
         });
     });
