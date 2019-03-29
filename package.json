@@ -1,0 +1,14 @@
+{
+  "name": "mmo",
+  "version": "1.0.0",
+  "description": "MMO Game Desktop App",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "electron": "^4.1.2"
+  }
+}
