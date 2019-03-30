@@ -263,7 +263,6 @@ function setup() {
     TILEMAP_component.buttonMode = true;
     // TILEMAP_component.renderable = false;
     // TILEMAP_component.visible = false;
-
     function scrollMap() {
         var zoomLevel = 60;
         var dx = 0;
@@ -274,25 +273,31 @@ function setup() {
             var rowEndPoint = Math.floor(1200/zoomLevel);
             var dxLimit = mapMatrix[0].length-rowEndPoint;
             var dyLimit = mapMatrix.length-columnEndPoint;
-            console.log(dx)
             switch(event.key) {
-                case 'ArrowUp':
+                case 'w':
+                    (TILEMAP_component.children).length = 0;
                     dy-=1;
                     break;
-                case 'ArrowDown':
+                case 's':
+                    (TILEMAP_component.children).length = 0;
                     dy+=1;
                     break;
-                case 'ArrowLeft':
+                case 'a':
+                    (TILEMAP_component.children).length = 0;
                     dx-=1;
                     break;
-                case 'ArrowRight':
+                case 'd':
+                    (TILEMAP_component.children).length = 0;
+                    console.log((TILEMAP_component.children).length);
                     dx+=1;
                     break;
                 case 'q':
-                    zoomLevel+=15;
+                    (TILEMAP_component.children).length = 0;
+                    zoomLevel+=1;
                     break;
                 case 'e':
-                    zoomLevel-=15;
+                    (TILEMAP_component.children).length = 0;
+                    zoomLevel-=1;
                     break;
             }
             if(dx >= dxLimit) { dx = dxLimit; }
@@ -300,13 +305,14 @@ function setup() {
             if(dy >= dyLimit) { dy = dyLimit; }
             if(dy < 0 ) { dy = 0; }
             if(zoomLevel >= 75) { zoomLevel=75; }
-            if(zoomLevel <= 30) { zoomLevel=30; }
+            if(zoomLevel <= 15) { zoomLevel=15; }
 
+            // console.log("render");
             continentMapping(TILEMAP_component, GUIborder, zoomLevel, 0xedebe6, dx, dy);
-
         });
     }
-    // scrollMap();
+
+    scrollMap();
 
     /********************************** preliminary setup for gameloop ************************************************************/
     var state = play; // initial state is "play"
