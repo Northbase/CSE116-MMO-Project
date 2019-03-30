@@ -9,10 +9,11 @@ app.on('ready', function() {
     window = new BrowserWindow({
         width: 1280,
         height: 720,
+        zoom: 0.8,
         frame: false,
-        zoom: 0.8
+        setFullScreen: true
     });
-    window.setFullScreen(true);
+    // window.setFullScreen(true);
     window.loadURL(url.format({
         pathname: path.join(__dirname, "FrontEnd/index.html"),
         protocol: 'file',
