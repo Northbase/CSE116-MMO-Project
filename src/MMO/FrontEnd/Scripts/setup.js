@@ -8,6 +8,8 @@
 
 // http://www.html5gamedevs.com/topic/34168-rendering-only-in-screen-objects/
 
+// let $ = require("jquery")
+
 var Application = PIXI.Application;
 var Container = PIXI.Container;
 var Sprite = PIXI.Sprite;
@@ -127,7 +129,7 @@ function setup() {
     continentSelection.width =  335;
     continentSelection.height = 120;
     continentSelection.on("click", ()=> {
-        $.get("sample.json", function(data) {
+        $.get("test.json", function(data) {
             console.log(data);
         });
     });

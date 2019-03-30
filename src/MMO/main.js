@@ -6,9 +6,15 @@ const {app, BrowserWindow} = electron;
 let window
 
 app.on('ready', function() {
-    window = new BrowserWindow({width: 1280, height: 720, zoomFactor: 0.8});
+    window = new BrowserWindow({
+        width: 1280,
+        height: 720,
+        frame: false,
+        zoom: 0.8
+    });
+    window.setFullScreen(true);
     window.loadURL(url.format({
-        pathname: path.join(__dirname, "FrontEnd/index.html"), // local HTML import fixed.
+        pathname: path.join(__dirname, "FrontEnd/index.html"),
         protocol: 'file',
         slashes: true
     }));

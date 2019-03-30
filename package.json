@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/jmacias11/MMO#readme",
   "dependencies": {
-    "electron": "^4.1.2"
+    "electron": "^4.1.2",
+    "jquery": "^3.3.1"
   }
 }
