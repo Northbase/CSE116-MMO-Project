@@ -1,14 +1,4 @@
-// https://stackoverflow.com/questions/4127991/grouping-shapes-and-text-in-html5-canvas
-// https://www.htmlgoodies.com/html5/client/the-complete-guide-to-building-html5-games-with-canvas-svg.html
-// https://github.com/kittykatattack/learningPixi#introduction
-// http://www.pixijs.com/tutorials
-
-//https://jayhant.com/honours-blog-9-eu4-map-modding-basics-what-i-had-in-2014-vs-what-i-have-now
-// https://pixijs.io/examples/#/basics/basic.js
-
-// http://www.html5gamedevs.com/topic/34168-rendering-only-in-screen-objects/
-
-// let $ = require("jquery")
+let $ = require("jquery")
 
 var Application = PIXI.Application;
 var Container = PIXI.Container;
@@ -19,6 +9,15 @@ var Texture = PIXI.Texture;
 var Text = PIXI.Text;
 var loader = PIXI.loader;
 var resources = PIXI.loader.resources;
+
+$.get("test.json", function(data) {
+    window.continentsInfoPacakge = data;
+});
+window.player = {
+    "name": "player1",
+    "continent": "Africa"
+};
+
 
 var app = new Application({
     width: 1280,
@@ -72,11 +71,6 @@ function setup() {
     var GUI_component = new Container();
 
     /************************************* GUI ***************************************************************/
-
-    window.goldQauntity = 0; // global variable
-    window.militaryQauntity = 0;
-    window.agricultureQauntity = 0;
-
     var profile = new Sprite(profile_rect);
     profile.position.set(GUIborder[0], GUIborder[1]+590);
     profile.width = 90;
@@ -89,7 +83,7 @@ function setup() {
     gold_stat.height = 90;
     GUI_component.addChild(gold_stat);
 
-    window.gold_magnitude = new Text(goldQauntity);
+    window.gold_magnitude = new Text();
     gold_magnitude.position.set(GUIborder[0]+110, GUIborder[1]+650);
     gold_magnitude.style.fill = 0x000000;
     gold_magnitude.style.fontSize = 15;
@@ -102,7 +96,7 @@ function setup() {
     military_stat.height = 90;
     GUI_component.addChild(military_stat);
 
-    window.military_magnitude = new Text(militaryQauntity);
+    window.military_magnitude = new Text();
     military_magnitude.position.set(GUIborder[0]+200, GUIborder[1]+650);
     military_magnitude.style.fill = 0x000000;
     military_magnitude.style.fontSize = 15;
@@ -115,7 +109,7 @@ function setup() {
     agriculture_stat.height = 90;
     GUI_component.addChild(agriculture_stat);
 
-    window.agriculture_magnitude = new Text(agricultureQauntity);
+    window.agriculture_magnitude = new Text();
     agriculture_magnitude.position.set(GUIborder[0]+290, GUIborder[1]+650);
     agriculture_magnitude.style.fill = 0x000000;
     agriculture_magnitude.style.fontSize = 15;
@@ -123,26 +117,17 @@ function setup() {
     GUI_component.addChild(agriculture_magnitude);
 
     var eventBox = new Sprite(eventBox_rect);
-    eventBox.interactive = true;
-    eventBox.buttonMode = true;
     eventBox.position.set(GUIborder[0]+445, GUIborder[1]+560);
     eventBox.width =  335;
     eventBox.height = 120;
-    // eventBox.on("click", ()=> {
-    //    $.get("index.css", function(data) {
-    //       console.log(data);
-    //    });
-    // });
     GUI_component.addChild(eventBox);
 
-    window.event_broadcast = new Text("");
-    event_broadcast.position.set(GUIborder[0]+445, GUIborder[1]+565);
+    window.event_broadcast = new Text();
+    event_broadcast.position.set(GUIborder[0]+445, GUIborder[1]+570);
     event_broadcast.style.fill = 0x000000;
     event_broadcast.style.fontSize = 20;
     event_broadcast.style.fontFamily = "Times New Roman";
     GUI_component.addChild(event_broadcast);
-
-
 
     var pressAttack = new Sprite(pressAttack_rect);
     pressAttack.interactive = true;
@@ -151,7 +136,16 @@ function setup() {
     pressAttack.width = 60;
     pressAttack.height = 60;
     pressAttack.on("click", ()=> {
-        console.log("Attack")
+        var continentInfoJSON = JSON.parse(continentsInfoPacakge);
+        var playerInfo = continentInfoJSON[player.continent];
+        var targetInfo = event_broadcast.text.split("\n");
+        if(targetInfo[0] != "") {
+
+            console.log("before",continentInfoJSON[player.continent].gold);
+            continentInfoJSON[player.continent].gold = playerInfo.gold - targetInfo[1];
+            console.log("after", continentInfoJSON[player.continent].gold);
+            // gold_magnitude.text = continentsInfoPacakge[playerContinent].gold;
+        }
     });
     GUI_component.addChild(pressAttack);
 
@@ -165,7 +159,6 @@ function setup() {
         console.log("Defend")
     });
     GUI_component.addChild(pressDefend);
-
 
     var map = new Sprite(map_rect);
     map.position.set(GUIborder[0]+790, GUIborder[1]+465);
@@ -303,14 +296,13 @@ function setup() {
             row_counter+=1;
         }
     }
-    continentMapping(TILEMAP_component, GUIborder, 60, 0xedebe6, 0, 0); // default game screen
-    continentMapping(GUI_component, MAPborder, 5, 0x9b9992, 0, 0); // default map screen
+    continentMapping(TILEMAP_component, GUIborder, 60, 0xc4b5a6, 0, 0); // default game screen
+    continentMapping(GUI_component, MAPborder, 5, 0x81848c, 0, 0); // default map screen
 
     TILEMAP_component.interactive = true;
     TILEMAP_component.buttonMode = true;
     // TILEMAP_component.renderable = false;
     // TILEMAP_component.visible = false;
-
     // GUI_component.destroy();
 
     function userInteraction() {
@@ -318,7 +310,7 @@ function setup() {
         window.dx = 0;
         window.dy = 0;
 
-        window.addEventListener("keydown", function(event) { // keyboard interaction
+        window.addEventListener("keydown", function(event) { // keyboard input
             var columnEndPoint = Math.floor(585/zoomLevel);
             var rowEndPoint = Math.floor(1200/zoomLevel);
             var dxLimit = mapTextureMatrix[0].length-rowEndPoint;
@@ -356,60 +348,69 @@ function setup() {
             if(zoomLevel >= 75) { zoomLevel=75; }
             if(zoomLevel <= 15) { zoomLevel=15; }
 
-            continentMapping(TILEMAP_component, GUIborder, zoomLevel, 0xedebe6, dx, dy);
+            continentMapping(TILEMAP_component, GUIborder, zoomLevel, 0xc4b5a6, dx, dy);
         });
 
         window.addEventListener("click", function() { // mouse interaction
             if(mouseXY[0] != null && mouseXY[1] != null) { // if mouse is out of tilemap, don't execute
                 var continentNum = mapRegionMatrix[mouseXY[1]][mouseXY[0]];
             }
+
             var regionInfo = {
-                "continent": ""
+                "location": {}
             };
+
+            var continentInfoJSON = JSON.parse(continentsInfoPacakge);
+
             switch(continentNum) {
                 case 0:
-                    regionInfo.continent = "Unclaimed";
+                    regionInfo.location = continentInfoJSON.Unclaimed;
                     break;
                 case 1:
-                    regionInfo.continent = "North America";
+                    regionInfo.location = continentInfoJSON.NorthAmerica;
                     break;
                 case 2:
-                    regionInfo.continent = "South America";
+                    regionInfo.location = continentInfoJSON.SouthAmerica;
                     break;
                 case 3:
-                    regionInfo.continent = "Africa";
+                    regionInfo.location = continentInfoJSON.Africa;
                     break;
                 case 4:
-                    regionInfo.continent = "Europe";
+                    regionInfo.location = continentInfoJSON.Europe;
                     break;
                 case 5:
-                    regionInfo.continent = "Asia";
+                    regionInfo.location = continentInfoJSON.Asia;
                     break;
                 case 6:
-                    regionInfo.continent = "Australia";
+                    regionInfo.location = continentInfoJSON.Australia;
                     break;
                 case 7:
-                    regionInfo.continent = "Antarctica";
+                    regionInfo.location = continentInfoJSON.Antarctica;
                     break;
             }
-            event_broadcast.text = regionInfo.continent;
+            // event_broadcast.text = JSON.stringify(regionInfo.location);
+            event_broadcast.text = [regionInfo.location.region, regionInfo.location.gold, regionInfo.location.military, regionInfo.location.agriculture].join().split(",").join("\n");
         });
     }
-
     userInteraction();
 
     /********************************** preliminary setup for gameloop ************************************************************/
+
     var state = play; // initial state is "play"
 
-    app.stage.addChild(TILEMAP_component)
-    app.stage.addChild(GUI_component);
-    app.renderer.render(app.stage); // render the stage components
+    setInterval(function() { // update states of all continents
+        $.get("test.json", function(data) {
+            // console.log(data);
+            continentsInfoPacakge = data;
+        });
+    }, 1000);
 
+    app.stage.addChild(TILEMAP_component);
+    app.stage.addChild(GUI_component);
+    app.renderer.render(app.stage);
 
     app.ticker.add(delta => gameLoop(delta, state));
 };
-
-
 
 /********************************** Game Loop *******************************************************************/
 function gameLoop(delta, state) {
@@ -417,7 +418,7 @@ function gameLoop(delta, state) {
 };
 
 function play(delta, state) {
-    // updateStats();
+    updateStats(player);
     updateTileSelection();
 
     // state(delta, pause);
@@ -428,14 +429,14 @@ function pause(delta) {
 }
 
 /******************************* Game Loop Methods **********************************************************************/
-function updateStats() {
-    goldQauntity+=1;
-    militaryQauntity+=1;
-    agricultureQauntity+=1;
+function updateStats(player) {
+    var playerContinent = player.continent;
 
-    gold_magnitude.text = goldQauntity;
-    military_magnitude.text = militaryQauntity;
-    agriculture_magnitude.text = agricultureQauntity;
+    var continentInfoJSON = JSON.parse(continentsInfoPacakge);
+
+    gold_magnitude.text = continentInfoJSON[playerContinent].gold;
+    military_magnitude.text = continentInfoJSON[playerContinent].military;
+    agriculture_magnitude.text = continentInfoJSON[playerContinent].agriculture;
 }
 
 function updateTileSelection() {
