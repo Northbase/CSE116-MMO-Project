@@ -13,10 +13,6 @@ const resources = PIXI.loader.resources;
 $.get("test.json", function(data) {
     window.continentsInfoPacakge = data;
 });
-window.player = {
-    "name": "player1",
-    "continent": "Antarctica"
-};
 
 
 var app = new Application({
@@ -66,11 +62,40 @@ function setup() {
     var pressAttack_rect = new Texture(GUI, new Rectangle(1500, 0, 250, 250));
     var pressDefend_rect = new Texture(GUI, new Rectangle(1750, 0, 250, 250));
 
+    var playButton_rect = new Texture(GUI, new Rectangle(0, 250, 250, 250));
+    var logo_rect = new Texture(GUI, new Rectangle(250, 250, 500, 250));
 
     var TILEMAP_component = new Container();
     var GUI_component = new Container();
+    var MAIN_MENU_component = new Container();
 
     /************************************* GUI ***************************************************************/
+    var logo = new Sprite(logo_rect);
+    logo.anchor.set(0.5, 0.5);
+    logo.width = 350;
+    logo.height = 100;
+    logo.position.set(app.screen.width/2, app.screen.height/2);
+    MAIN_MENU_component.addChild(logo);
+
+    var playButton = new Sprite(playButton_rect);
+    playButton.anchor.set(0.5, 0.5);
+    playButton.position.set(app.screen.width/2, app.screen.height/2 + 150);
+    playButton.width = 90;
+    playButton.height = 90;
+    playButton.interactive = true;
+    playButton.buttonMode = true;
+    playButton.on("click", ()=> { // eventually send request to server
+        state = play; // set state to play
+        window.player = { // generate player id ... it should be randomized in future
+            "name": "player1",
+            "continent": "Antarctica"
+        };
+        app.stage.children[0].visible = true; // allow rendering TILEMAP
+        app.stage.children[1].visible = true; // allow rendering GUI
+        app.stage.children[2].visible = false;// prevent mainMenu from rendering
+    });
+    MAIN_MENU_component.addChild(playButton);
+
     var profile = new Sprite(profile_rect);
     profile.position.set(GUIborder[0], GUIborder[1]+590);
     profile.width = 90;
@@ -307,9 +332,6 @@ function setup() {
 
     TILEMAP_component.interactive = true;
     TILEMAP_component.buttonMode = true;
-    // TILEMAP_component.renderable = false;
-    // TILEMAP_component.visible = false;
-    // GUI_component.destroy();
 
     function userInteraction() {
         window.zoomLevel = 60;
@@ -358,7 +380,7 @@ function setup() {
         });
 
         window.addEventListener("click", function() { // mouse interaction
-            if(mouseXY[0] != null && mouseXY[1] != null) { // if mouse is out of tilemap, don't execute
+            if(state == play && (mouseXY[0] != null && mouseXY[1] != null)) { // if mouse is out of tilemap, don't execute
                 var continentNum = mapRegionMatrix[mouseXY[1]][mouseXY[0]];
             }
 
@@ -402,7 +424,11 @@ function setup() {
 
     /********************************** preliminary setup for gameloop ************************************************************/
 
-    var state = play; // set state as "play"
+        // TILEMAP_component.renderable = false;
+        // TILEMAP_component.visible = false;
+        // GUI_component.destroy();
+
+    window.state = mainMenu; // set state as "play"
 
     setInterval(function() { // update states of all continents every second
         $.get("test.json", function(data) {
@@ -413,19 +439,26 @@ function setup() {
 
     app.stage.addChild(TILEMAP_component);
     app.stage.addChild(GUI_component);
-    app.renderer.render(app.stage);
-
+    app.stage.addChild(MAIN_MENU_component);
+    // app.renderer.render(app.stage);
     app.ticker.add(delta => gameLoop(delta, state));
-};
+}
 
 /********************************** Game Loop *******************************************************************/
 function gameLoop(delta, state) {
     state(delta, state);
-};
+}
+
+function mainMenu(delta, state) {
+    app.stage.children[0].visible = false; // prevent TILEMAP from rendering
+    app.stage.children[1].visible = false; // prevent GUI from rendering
+    // var renderObject = app.stage.children[0];
+    app.renderer.render(app.stage);
+}
 
 function play(delta, state) {
     updateStats(player);
-    updateTileSelection();
+    updateTileSelection(state);
 }
 
 
@@ -440,14 +473,16 @@ function updateStats(player) {
     agriculture_magnitude.text = continentInfoJSON[playerContinent].agriculture;
 }
 
-function updateTileSelection() {
-    var columnEndPoint = Math.floor(585/zoomLevel);
-    var rowEndPoint = Math.floor(1200/zoomLevel);
-    var x = Math.floor((app.renderer.plugins.interaction.mouse.global.x-40)/zoomLevel)+dx;
-    var y = Math.floor((app.renderer.plugins.interaction.mouse.global.y-30)/zoomLevel)+dy;
+function updateTileSelection(state) {
+    if(state == play) {
+        var columnEndPoint = Math.floor(585/zoomLevel);
+        var rowEndPoint = Math.floor(1200/zoomLevel);
+        var x = Math.floor((app.renderer.plugins.interaction.mouse.global.x-40)/zoomLevel)+dx;
+        var y = Math.floor((app.renderer.plugins.interaction.mouse.global.y-30)/zoomLevel)+dy;
 
-    if(x > rowEndPoint+dx-1 || x < 0) { x=null; }
-    if(y > columnEndPoint+dy-1 || y < 0) { y=null; }
+        if(x > rowEndPoint+dx-1 || x < 0) { x=null; }
+        if(y > columnEndPoint+dy-1 || y < 0) { y=null; }
 
-    window.mouseXY = [x, y];
+        window.mouseXY = [x, y];
+    }
 }
