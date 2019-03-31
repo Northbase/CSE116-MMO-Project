@@ -59,7 +59,7 @@ function setup() {
 
     var GUI = TextureCache["textures/GUI.png"];
     var map_rect = new Texture(GUI, new Rectangle(0, 0, 250, 250));
-    var continentSelection_rect = new Texture(GUI, new Rectangle(250, 0, 250, 250));
+    var eventBox_rect = new Texture(GUI, new Rectangle(250, 0, 250, 250));
     var profile_rect = new Texture(GUI, new Rectangle(500, 0, 250, 250));
     var gold_stat_rect = new Texture(GUI, new Rectangle(750, 0, 250, 250));
     var military_stat_rect = new Texture(GUI, new Rectangle(1000, 0, 250, 250));
@@ -122,18 +122,27 @@ function setup() {
     agriculture_magnitude.style.fontFamily = "Times New Roman";
     GUI_component.addChild(agriculture_magnitude);
 
-    var continentSelection = new Sprite(continentSelection_rect);
-    continentSelection.interactive = true;
-    continentSelection.buttonMode = true;
-    continentSelection.position.set(GUIborder[0]+445, GUIborder[1]+560);
-    continentSelection.width =  335;
-    continentSelection.height = 120;
-    continentSelection.on("click", ()=> {
-        $.get("test.json", function(data) {
-            console.log(data);
-        });
-    });
-    GUI_component.addChild(continentSelection);
+    var eventBox = new Sprite(eventBox_rect);
+    eventBox.interactive = true;
+    eventBox.buttonMode = true;
+    eventBox.position.set(GUIborder[0]+445, GUIborder[1]+560);
+    eventBox.width =  335;
+    eventBox.height = 120;
+    // eventBox.on("click", ()=> {
+    //    $.get("index.css", function(data) {
+    //       console.log(data);
+    //    });
+    // });
+    GUI_component.addChild(eventBox);
+
+    window.event_broadcast = new Text("");
+    event_broadcast.position.set(GUIborder[0]+445, GUIborder[1]+565);
+    event_broadcast.style.fill = 0x000000;
+    event_broadcast.style.fontSize = 20;
+    event_broadcast.style.fontFamily = "Times New Roman";
+    GUI_component.addChild(event_broadcast);
+
+
 
     var pressAttack = new Sprite(pressAttack_rect);
     pressAttack.interactive = true;
@@ -170,7 +179,8 @@ function setup() {
 
     /************************************* TILEMAP ***************************************************************/
 
-    var mapMatrix = [ //default mapMatrix (39x80 matrix <suitable for 15px>)
+
+    var mapTextureMatrix = [ //default mapTextureMatrix (39x80 matrix <suitable for 15px>) [texture, r]
         [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,1,0,1,1,1,0,1,1,1,1,1,0,0,0,0,0,0,0,2,2,2,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,1,0,0,0,0],
         [0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,1,1,1,0,0,1,1,1,1,1,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,2,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0],
@@ -212,13 +222,55 @@ function setup() {
         [0,0,0,0,0,0,0,0,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,0,0,0,0,0],
     ];
 
+    var mapRegionMatrix = [ // 1 = North America, 2 = South America, 3 = Africa, 4 = Europe, 5 = Asia, 6 = Australia, 7 = Antarctica
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,1,0,1,1,1,0,1,1,1,1,1,0,0,0,0,0,0,0,4,4,4,0,0,0,0,0,0,0,0,0,0,5,5,5,5,0,5,5,5,5,5,5,5,5,5,5,5,5,0,0,0,0,0,5,0,0,0,0],
+        [0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,1,1,1,0,0,1,1,1,1,1,0,0,0,0,0,0,0,4,4,4,4,4,4,4,4,4,0,0,0,0,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,0,0,0],
+        [0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,0,1,0,0,1,1,0,0,0,4,0,0,4,0,4,4,4,4,0,4,4,4,4,4,4,4,0,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,0,0,0,0,5,5,5,5,0,0,0,0,0],
+        [0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,0,0,0,0,0,0,0,0,4,0,4,4,4,4,4,0,4,4,4,4,4,4,4,4,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,0,0,5,0,5,5,0,0,0,0],
+        [0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,4,4,4,4,0,4,4,4,4,4,4,4,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,4,4,4,4,4,4,4,4,4,4,4,4,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,0,0,0,0,0,0],
+        [0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,4,4,4,4,4,4,4,4,4,4,4,4,0,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,0,0,5,0,0,0,0],
+        [0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,4,4,4,0,4,4,0,4,4,4,4,4,4,4,5,5,0,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,0,5,0,0,0,0,0],
+        [0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,4,4,4,4,0,4,0,0,0,4,0,4,4,4,0,5,5,5,0,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,0,5,0,0,5,5,0,0,0,0],
+        [0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,4,4,4,0,0,0,4,0,0,0,0,0,0,4,0,5,5,5,0,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,0,0,5,0,5,5,0,0,0,0,0],
+        [0,0,0,0,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,4,4,0,0,0,0,0,0,3,3,3,3,0,0,0,0,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,0,0,0,5,0,0,0,0,0,0],
+        [0,0,0,0,0,1,0,1,1,1,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,3,3,3,3,3,3,3,3,3,3,3,0,0,0,5,5,5,5,5,5,5,5,5,0,5,5,5,5,5,5,5,5,5,5,5,5,5,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,5,5,5,5,5,5,5,0,0,5,5,5,5,5,5,5,5,5,5,5,5,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,5,5,5,5,5,5,5,0,0,5,5,5,5,5,5,5,5,5,5,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,5,5,5,5,5,0,0,0,0,5,5,5,5,5,0,5,5,5,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,5,5,5,5,5,5,5,0,0,5,5,5,0,0,0,5,5,0,0,0,6,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,5,5,5,5,5,5,0,0,0,0,5,5,0,0,0,0,5,5,0,0,6,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,5,5,0,5,0,0,0,0,0,5,0,0,0,0,0,0,5,0,6,0,0,0,0,6,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,6,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,3,3,3,0,3,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,6,6,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,0,6,6,0,0,6,0,0,0,0,6,6,6,6,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,0,6,6,6,6,6,6,6,6,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0,6,0,0,6,0,0,6,6,6,6,6,6,6,6,6,6,6,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,3,3,3,3,3,0,0,3,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,6,6,6,6,6,6,6,6,6,6,6,6,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,3,3,3,3,3,0,3,3,0,0,0,0,0,0,0,0,0,0,0,6,0,0,0,6,6,6,6,6,6,6,6,6,6,6,6,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,3,3,3,3,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,6,6,6,6,6,6,6,6,6,6,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,6,6,6,6,6,6,6,6,6,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,6,6,6,0,0,0,6,6,6,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,6,0,0,0,0,6,6,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,6,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,0,6,6,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,7,0,0,0,0,0,0,0,0,0,0,0,0,7,0,0,0,0,0,0,0,0,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,0,0,7,7,7,0,0,0,7,7,7,0,0,0,7,7,0,0,0,0,0,7,0,7,7,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,7,7,7,7,0,0,0,7,7,7,7,7,7,7,7,0,7,7,7,7,7,0,0,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,0,0,0,0,0],
+    ];
+
     function continentMapping(component, border, size, tint, dx, dy) {
         var column_counter = 0;
         var row_counter = 0;
         var columnEndPoint = Math.floor(585/size);
         var rowEndPoint = Math.floor(1200/size);
 
-        for(var row of mapMatrix.slice(0+dy, columnEndPoint+dy)) {
+        for(var row of mapTextureMatrix.slice(0+dy, columnEndPoint+dy)) {
             for(var tile of row.slice(0+dx, rowEndPoint+dx)) {
                 switch(tile) {
                     case 0:
@@ -240,14 +292,10 @@ function setup() {
                         var tile_texture = new Sprite(dirt_rect);
                         break;
                 }
-                // tile_texture.interactive = true;
-                // tile_texture.buttonMode = true;
                 tile_texture.tint = tint;
                 tile_texture.position.set(border[0] + size*column_counter, border[1] + size*row_counter);
                 tile_texture.width = size;
                 tile_texture.height = size;
-                tile_texture.name = [row_counter, column_counter];
-                // console.log(tile_texture.name);
                 component.addChild(tile_texture);
                 column_counter+=1;
             }
@@ -255,24 +303,26 @@ function setup() {
             row_counter+=1;
         }
     }
-    continentMapping(TILEMAP_component, GUIborder, 60, 0xedebe6, 0, 0);
-
-    continentMapping(GUI_component, MAPborder, 5, 0x9b9992, 0, 0);
+    continentMapping(TILEMAP_component, GUIborder, 60, 0xedebe6, 0, 0); // default game screen
+    continentMapping(GUI_component, MAPborder, 5, 0x9b9992, 0, 0); // default map screen
 
     TILEMAP_component.interactive = true;
     TILEMAP_component.buttonMode = true;
     // TILEMAP_component.renderable = false;
     // TILEMAP_component.visible = false;
-    function scrollMap() {
-        var zoomLevel = 60;
-        var dx = 0;
-        var dy = 0;
 
-        window.addEventListener("keydown", function(event) {
+    // GUI_component.destroy();
+
+    function userInteraction() {
+        window.zoomLevel = 60;
+        window.dx = 0;
+        window.dy = 0;
+
+        window.addEventListener("keydown", function(event) { // keyboard interaction
             var columnEndPoint = Math.floor(585/zoomLevel);
             var rowEndPoint = Math.floor(1200/zoomLevel);
-            var dxLimit = mapMatrix[0].length-rowEndPoint;
-            var dyLimit = mapMatrix.length-columnEndPoint;
+            var dxLimit = mapTextureMatrix[0].length-rowEndPoint;
+            var dyLimit = mapTextureMatrix.length-columnEndPoint;
             switch(event.key) {
                 case 'w':
                     (TILEMAP_component.children).length = 0;
@@ -288,7 +338,6 @@ function setup() {
                     break;
                 case 'd':
                     (TILEMAP_component.children).length = 0;
-                    console.log((TILEMAP_component.children).length);
                     dx+=1;
                     break;
                 case 'q':
@@ -307,12 +356,47 @@ function setup() {
             if(zoomLevel >= 75) { zoomLevel=75; }
             if(zoomLevel <= 15) { zoomLevel=15; }
 
-            // console.log("render");
             continentMapping(TILEMAP_component, GUIborder, zoomLevel, 0xedebe6, dx, dy);
+        });
+
+        window.addEventListener("click", function() { // mouse interaction
+            if(mouseXY[0] != null && mouseXY[1] != null) { // if mouse is out of tilemap, don't execute
+                var continentNum = mapRegionMatrix[mouseXY[1]][mouseXY[0]];
+            }
+            var regionInfo = {
+                "continent": ""
+            };
+            switch(continentNum) {
+                case 0:
+                    regionInfo.continent = "Unclaimed";
+                    break;
+                case 1:
+                    regionInfo.continent = "North America";
+                    break;
+                case 2:
+                    regionInfo.continent = "South America";
+                    break;
+                case 3:
+                    regionInfo.continent = "Africa";
+                    break;
+                case 4:
+                    regionInfo.continent = "Europe";
+                    break;
+                case 5:
+                    regionInfo.continent = "Asia";
+                    break;
+                case 6:
+                    regionInfo.continent = "Australia";
+                    break;
+                case 7:
+                    regionInfo.continent = "Antarctica";
+                    break;
+            }
+            event_broadcast.text = regionInfo.continent;
         });
     }
 
-    scrollMap();
+    userInteraction();
 
     /********************************** preliminary setup for gameloop ************************************************************/
     var state = play; // initial state is "play"
@@ -320,6 +404,7 @@ function setup() {
     app.stage.addChild(TILEMAP_component)
     app.stage.addChild(GUI_component);
     app.renderer.render(app.stage); // render the stage components
+
 
     app.ticker.add(delta => gameLoop(delta, state));
 };
@@ -333,13 +418,13 @@ function gameLoop(delta, state) {
 
 function play(delta, state) {
     // updateStats();
-    // updateTileSelection();
+    updateTileSelection();
 
     // state(delta, pause);
 }
 
 function pause(delta) {
-    console.log("pasued");
+    console.log("paused");
 }
 
 /******************************* Game Loop Methods **********************************************************************/
@@ -354,7 +439,13 @@ function updateStats() {
 }
 
 function updateTileSelection() {
-    var x = Math.floor((app.renderer.plugins.interaction.mouse.global.x-40)/60);
-    var y = Math.floor((app.renderer.plugins.interaction.mouse.global.y-30)/60);
-    console.log([x,y]);
+    var columnEndPoint = Math.floor(585/zoomLevel);
+    var rowEndPoint = Math.floor(1200/zoomLevel);
+    var x = Math.floor((app.renderer.plugins.interaction.mouse.global.x-40)/zoomLevel)+dx;
+    var y = Math.floor((app.renderer.plugins.interaction.mouse.global.y-30)/zoomLevel)+dy;
+
+    if(x > rowEndPoint+dx-1 || x < 0) { x=null; }
+    if(y > columnEndPoint+dy-1 || y < 0) { y=null; }
+
+    window.mouseXY = [x, y];
 }
