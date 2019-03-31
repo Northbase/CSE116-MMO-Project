@@ -3,7 +3,7 @@ const url = require('url');
 const path = require('path');
 const {app, BrowserWindow} = electron;
 
-let window
+let window;
 
 app.on('ready', function() {
     window = new BrowserWindow({

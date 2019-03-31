@@ -1,14 +1,14 @@
-let $ = require("jquery");
+const $ = require("jquery");
 
-var Application = PIXI.Application;
-var Container = PIXI.Container;
-var Sprite = PIXI.Sprite;
-var TextureCache = PIXI.utils.TextureCache;
-var Rectangle = PIXI.Rectangle;
-var Texture = PIXI.Texture;
-var Text = PIXI.Text;
-var loader = PIXI.loader;
-var resources = PIXI.loader.resources;
+const Application = PIXI.Application;
+const Container = PIXI.Container;
+const Sprite = PIXI.Sprite;
+const TextureCache = PIXI.utils.TextureCache;
+const Rectangle = PIXI.Rectangle;
+const Texture = PIXI.Texture;
+const Text = PIXI.Text;
+const loader = PIXI.loader;
+const resources = PIXI.loader.resources;
 
 $.get("test.json", function(data) {
     window.continentsInfoPacakge = data;
