@@ -165,7 +165,7 @@ function setup() {
         var playerInfo = continentInfoJSON[player.continent];
         var targetInfoArr = event_broadcast.text.split("\n");
         var targetInfo = {"continent": targetInfoArr[0], "gold": targetInfoArr[1], "military": targetInfoArr[2], "agriculture": targetInfoArr[3]};
-        if(targetInfo.continent != "" || targetInfo.continent != "Uncalimed") {
+        if(targetInfo.continent != player.continent && (targetInfo.continent != "" || targetInfo.continent != "Uncalimed")) {// prevent attacking own continent and unclaimed continent
             console.log("before",continentInfoJSON[player.continent].military);
             continentInfoJSON[player.continent].military = playerInfo.military - targetInfo.military;
             console.log("after", continentInfoJSON[player.continent].military);
@@ -185,7 +185,7 @@ function setup() {
         var playerInfo = continentInfoJSON[player.continent];
         var targetInfoArr = event_broadcast.text.split("\n");
         var targetInfo = {"continent": targetInfoArr[0], "gold": targetInfoArr[1], "military": targetInfoArr[2], "agriculture": targetInfoArr[3]};
-        if(targetInfo.continent != "" || targetInfo.continent != "Uncalimed") {
+        if(targetInfo.continent != player.continent && (targetInfo.continent != "" || targetInfo.continent != "Uncalimed")) { // prevent defending own continent and unclaimed continent
             console.log("before",continentInfoJSON[player.continent].military);
             continentInfoJSON[player.continent].military = playerInfo.military - targetInfo.military;
             console.log("after", continentInfoJSON[player.continent].military);
@@ -373,7 +373,7 @@ function setup() {
             if(dx < 0 ) { dx = 0; }
             if(dy >= dyLimit) { dy = dyLimit; }
             if(dy < 0 ) { dy = 0; }
-            if(zoomLevel >= 75) { zoomLevel=75; }
+            if(zoomLevel >= 90) { zoomLevel=90; }
             if(zoomLevel <= 15) { zoomLevel=15; }
 
             continentMapping(TILEMAP_component, GUIborder, zoomLevel, 0xc4b5a6, dx, dy);
