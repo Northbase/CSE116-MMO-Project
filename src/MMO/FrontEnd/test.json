@@ -7,48 +7,48 @@
     "gold": 100.0,
     "military": 80.0,
     "agriculture": 50.0,
-    "player": "player01"
+    "player": "player#"
   },
   "SouthAmerica": {
     "region": "South America",
     "gold": 100.0,
     "military": 80.0,
     "agriculture": 50.0,
-    "player": "player02"
+    "player": "player#"
   },
   "Africa": {
     "region": "Africa",
     "gold": 500.0,
     "military": 80.0,
     "agriculture": 50.0,
-    "player": "player02"
+    "player": "player#"
   },
   "Europe": {
     "region": "Europe",
     "gold": 100.0,
     "military": 80.0,
     "agriculture": 50.0,
-    "player": "player02"
+    "player": "player#"
   },
   "Asia": {
     "region": "Asia",
     "gold": 100.0,
     "military": 80.0,
     "agriculture": 50.0,
-    "player": "player02"
+    "player": "player#"
   },
   "Australia": {
     "region": "Australia",
     "gold": 100.0,
     "military": 80.0,
     "agriculture": 50.0,
-    "player": "player02"
+    "player": "player#"
   },
   "Antarctica": {
     "region": "Antarctica",
     "gold": 100.0,
     "military": 80.0,
     "agriculture": 50.0,
-    "player": "player02"
+    "player": "player#"
   }
 }
