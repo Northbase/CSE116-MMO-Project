@@ -1,4 +1,4 @@
-let $ = require("jquery")
+let $ = require("jquery");
 
 var Application = PIXI.Application;
 var Container = PIXI.Container;
@@ -15,7 +15,7 @@ $.get("test.json", function(data) {
 });
 window.player = {
     "name": "player1",
-    "continent": "Africa"
+    "continent": "Antarctica"
 };
 
 
@@ -135,16 +135,16 @@ function setup() {
     pressAttack.position.set(GUIborder[0]+380, GUIborder[1]+560);
     pressAttack.width = 60;
     pressAttack.height = 60;
-    pressAttack.on("click", ()=> {
+    pressAttack.on("click", ()=> { // calculation should be handled in back-end
         var continentInfoJSON = JSON.parse(continentsInfoPacakge);
         var playerInfo = continentInfoJSON[player.continent];
-        var targetInfo = event_broadcast.text.split("\n");
-        if(targetInfo[0] != "") {
-
-            console.log("before",continentInfoJSON[player.continent].gold);
-            continentInfoJSON[player.continent].gold = playerInfo.gold - targetInfo[1];
-            console.log("after", continentInfoJSON[player.continent].gold);
-            // gold_magnitude.text = continentsInfoPacakge[playerContinent].gold;
+        var targetInfoArr = event_broadcast.text.split("\n");
+        var targetInfo = {"continent": targetInfoArr[0], "gold": targetInfoArr[1], "military": targetInfoArr[2], "agriculture": targetInfoArr[3]};
+        if(targetInfo.continent != "" || targetInfo.continent != "Uncalimed") {
+            console.log("before",continentInfoJSON[player.continent].military);
+            continentInfoJSON[player.continent].military = playerInfo.military - targetInfo.military;
+            console.log("after", continentInfoJSON[player.continent].military);
+            continentsInfoPacakge = JSON.stringify(continentInfoJSON);
         }
     });
     GUI_component.addChild(pressAttack);
@@ -155,8 +155,17 @@ function setup() {
     pressDefend.position.set(GUIborder[0]+380, GUIborder[1]+620);
     pressDefend.width = 60;
     pressDefend.height = 60;
-    pressDefend.on("click", ()=> {
-        console.log("Defend")
+    pressDefend.on("click", ()=> { // calculation should be handled in back-end
+        var continentInfoJSON = JSON.parse(continentsInfoPacakge);
+        var playerInfo = continentInfoJSON[player.continent];
+        var targetInfoArr = event_broadcast.text.split("\n");
+        var targetInfo = {"continent": targetInfoArr[0], "gold": targetInfoArr[1], "military": targetInfoArr[2], "agriculture": targetInfoArr[3]};
+        if(targetInfo.continent != "" || targetInfo.continent != "Uncalimed") {
+            console.log("before",continentInfoJSON[player.continent].military);
+            continentInfoJSON[player.continent].military = playerInfo.military - targetInfo.military;
+            console.log("after", continentInfoJSON[player.continent].military);
+            continentsInfoPacakge = JSON.stringify(continentInfoJSON);
+        }
     });
     GUI_component.addChild(pressDefend);
 
@@ -164,9 +173,6 @@ function setup() {
     map.position.set(GUIborder[0]+790, GUIborder[1]+465);
     map.width = 410;
     map.height = 205;
-    map.on("click", ()=> {
-        console.log("map enabled")
-    });
     GUI_component.addChild(map);
 
 
@@ -396,9 +402,9 @@ function setup() {
 
     /********************************** preliminary setup for gameloop ************************************************************/
 
-    var state = play; // initial state is "play"
+    var state = play; // set state as "play"
 
-    setInterval(function() { // update states of all continents
+    setInterval(function() { // update states of all continents every second
         $.get("test.json", function(data) {
             // console.log(data);
             continentsInfoPacakge = data;
@@ -420,13 +426,8 @@ function gameLoop(delta, state) {
 function play(delta, state) {
     updateStats(player);
     updateTileSelection();
-
-    // state(delta, pause);
 }
 
-function pause(delta) {
-    console.log("paused");
-}
 
 /******************************* Game Loop Methods **********************************************************************/
 function updateStats(player) {
