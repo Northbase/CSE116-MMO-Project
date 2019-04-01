@@ -1,6 +1,7 @@
 package MMO.Backend.Classes
-
-abstract class Continent(var Money: Int, var Troops: Int, var Resources: Int, var GrowthRates: Map[String, Int]) {
+import play.api.libs.json
+import play.api.libs.json.Json
+abstract class Continent(var name: String, var Money: Int, var Troops: Int, var Resources: Int, var MoneyGrowth: Int, var TroopGrowth: Int, var ResourceGrowth: Int) {
 
   var troopsDefending : Int = 0
   var troopsAttacking : Int = 0
@@ -32,9 +33,9 @@ abstract class Continent(var Money: Int, var Troops: Int, var Resources: Int, va
   }
 
   def update() ={
-    Money += GrowthRates("Money")
-    Troops += GrowthRates("Troops")
-    Resources += GrowthRates("Resources")
+    Money += MoneyGrowth
+    Troops += TroopGrowth
+    Resources += ResourceGrowth
   }
 
   def battle(attacker: Continent, defender: Continent) {
@@ -53,7 +54,12 @@ abstract class Continent(var Money: Int, var Troops: Int, var Resources: Int, va
       attacker.troopsAttacking = 0
     }
   }
+  //puts all the properties in an array
+  def toJson(): String = {
+    var Arr: Array[Int] = Array(Money, Troops, Resources, MoneyGrowth, TroopGrowth, ResourceGrowth)
+    return Json.stringify(Json.toJson(Arr))
+  }
 
 
-
+}
 }

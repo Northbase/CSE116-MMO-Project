@@ -6,18 +6,20 @@ def initalize():
     c = conn.cursor()
 
     c.execute('CREATE TABLE IF NOT EXISTS game(continent, money, troops, agriculture)')
-
+    #
     return (conn,c)
 
 def write(obj):
-
+    dict = json.loads(obj)
+    array = dict['Arr']
     (conn,cur) = initalize()
-
     continent = obj["continent"]
     Money = obj["Money"]
     Troops = obj["Troops"]
-    GrowthRate = obj["GrowthRate"]
-
+    Resources = obj["Resources"]
+    MoneyGrowth = obj["MoneyGrowth"]
+    TroopGrowth = obj["TroopGrowth"]
+    ResourceGrowth = obj["GrowthResource"]
 
     check = {}
 
@@ -25,7 +27,7 @@ def write(obj):
     for row in rows:
         check = row
     if check == {}:
-        cur.execute("INSERT INTO game VALUES (?,?,?,?)", (continent, Money, GrowthRate, Troops, ))
+        cur.execute("INSERT INTO game VALUES (?,?,?,?)", (continent, Money, Troops, Resources, MoneyGrowth, TroopGrowth, ResourceGrowth))
         conn.commit()
     cur.close()
 
@@ -42,8 +44,8 @@ def read(continent):
     print(data)
     return json.dumps(data)
 
-#
+
 if __name__ == '__main__':
     initalize()
     read("northAmerica")
-    write({"continent": "northAmerica", "Money": 99999, "Troops": 23, "GrowthRate": 59897, })
+    write({"continent": "northAmerica", "Money": 99999, "Troops": 23, "Resources": 59897, "MoneyGrowth": 24, "TroopGrowth": 6735, "ResourceGrowth": 841})
