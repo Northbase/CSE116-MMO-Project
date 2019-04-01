@@ -39,7 +39,7 @@ def read(continent):
 
     data = {}
     for row in rows:
-        data = {"continent": row[0], "money": row[1], "agriculture": row[2], "troops": [3]}
+        data = {"continent": row[0], "Money": row[1], "Troops": row[2], "Resources": row[3], "MoneyGrowth": row[4], "TroopGrowth": row[5], "ResourceGrowth": row[6]}
 
     print(data)
     return json.dumps(data)
