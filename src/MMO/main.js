@@ -14,7 +14,7 @@ app.on('ready', function() {
         setFullScreen: true
     });
     window.loadURL(url.format({
-        pathname: path.join(__dirname, "src/MMO/FrontEnd/index.html"),
+        pathname: path.join(__dirname, "FrontEnd/index.html"),
         protocol: 'file',
         slashes: true
     }));
