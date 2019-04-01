@@ -14,12 +14,12 @@ def write(obj):
     array = dict['Arr']
     (conn,cur) = initalize()
     continent = array[0]
-    Money = obj[1]
-    Troops = obj[2]
-    Resources = obj[3]
-    MoneyGrowth = obj[4]
-    TroopGrowth = obj[5]
-    ResourceGrowth = obj[6]
+    Money = array[1]
+    Troops = array[2]
+    Resources = array[3]
+    MoneyGrowth = array[4]
+    TroopGrowth = array[5]
+    ResourceGrowth = array[6]
 
     check = {}
 
