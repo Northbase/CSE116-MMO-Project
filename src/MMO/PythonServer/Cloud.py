@@ -13,13 +13,13 @@ def write(obj):
     dict = json.loads(obj)
     array = dict['Arr']
     (conn,cur) = initalize()
-    continent = obj["continent"]
-    Money = obj["Money"]
-    Troops = obj["Troops"]
-    Resources = obj["Resources"]
-    MoneyGrowth = obj["MoneyGrowth"]
-    TroopGrowth = obj["TroopGrowth"]
-    ResourceGrowth = obj["GrowthResource"]
+    continent = array[0]
+    Money = obj[1]
+    Troops = obj[2]
+    Resources = obj[3]
+    MoneyGrowth = obj[4]
+    TroopGrowth = obj[5]
+    ResourceGrowth = obj[6]
 
     check = {}
 
@@ -27,7 +27,7 @@ def write(obj):
     for row in rows:
         check = row
     if check == {}:
-        cur.execute("INSERT INTO game VALUES (?,?,?,?)", (continent, Money, Troops, Resources, MoneyGrowth, TroopGrowth, ResourceGrowth))
+        cur.execute("INSERT INTO game VALUES (?,?,?,?,?,?,?)", (continent, Money, Troops, Resources, MoneyGrowth, TroopGrowth, ResourceGrowth))
         conn.commit()
     cur.close()
 
