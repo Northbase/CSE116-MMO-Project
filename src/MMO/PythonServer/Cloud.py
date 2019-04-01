@@ -6,7 +6,6 @@ def initalize():
     c = conn.cursor()
 
     c.execute('CREATE TABLE IF NOT EXISTS game(continent, money, troops, agriculture)')
-    #
     return (conn,c)
 
 def write(obj):

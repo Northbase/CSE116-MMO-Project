@@ -1,7 +1,7 @@
 package MMO.Backend.Classes
 import play.api.libs.json
 import play.api.libs.json.Json
-abstract class Continent(var name: String, var Money: Int, var Troops: Int, var Resources: Int, var MoneyGrowth: Int, var TroopGrowth: Int, var ResourceGrowth: Int) {
+abstract class Continent(var Name: String, var Money: Int, var Troops: Int, var Resources: Int, var MoneyGrowth: Int, var TroopGrowth: Int, var ResourceGrowth: Int) {
 
   var troopsDefending : Int = 0
   var troopsAttacking : Int = 0
@@ -56,10 +56,15 @@ abstract class Continent(var name: String, var Money: Int, var Troops: Int, var 
   }
   //puts all the properties in an array
   def toJson(): String = {
-    var Arr: Array[Int] = Array(Money, Troops, Resources, MoneyGrowth, TroopGrowth, ResourceGrowth)
+    var money: String = Money.toString()
+    var troops: String = Troops.toString() //returns any, at least for me
+    var resources: String = Resources.toString()
+    var moneygrowth: String = MoneyGrowth.toString()
+    var troopgrowth: String = TroopGrowth.toString()
+    var resourcegrowth: String = ResourceGrowth.toString
+    var Arr: Array[String] = Array(Name, money, troops, resources, moneygrowth, troopgrowth, resourcegrowth)
     return Json.stringify(Json.toJson(Arr))
   }
 
 
-}
 }
