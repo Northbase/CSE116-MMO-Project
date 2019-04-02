@@ -1,6 +1,6 @@
 package MMO.Backend
 
-import MMO.Backend.Classes.Continent
+import MMO.Backend.Classes.
 
 class Game(var ContinentsInGame : List[Continent]) {
   var daysPassed : Int = 0
