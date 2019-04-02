@@ -167,7 +167,9 @@ function setup() {
         var targetInfo = {"continent": targetInfoArr[0], "gold": targetInfoArr[1], "military": targetInfoArr[2], "agriculture": targetInfoArr[3]};
         if(targetInfo.continent != player.continent && (targetInfo.continent != "" || targetInfo.continent != "Uncalimed")) {// prevent attacking own continent and unclaimed continent
             console.log("before",continentInfoJSON[player.continent].military);
+            continentInfoJSON[player.continent].gold = playerInfo.gold - targetInfo.gold;
             continentInfoJSON[player.continent].military = playerInfo.military - targetInfo.military;
+            continentInfoJSON[player.continent].agriculture = playerInfo.agriculture - targetInfo.agriculture;
             console.log("after", continentInfoJSON[player.continent].military);
             continentsInfoPacakge = JSON.stringify(continentInfoJSON);
         }
@@ -187,7 +189,9 @@ function setup() {
         var targetInfo = {"continent": targetInfoArr[0], "gold": targetInfoArr[1], "military": targetInfoArr[2], "agriculture": targetInfoArr[3]};
         if(targetInfo.continent != player.continent && (targetInfo.continent != "" || targetInfo.continent != "Uncalimed")) { // prevent defending own continent and unclaimed continent
             console.log("before",continentInfoJSON[player.continent].military);
+            continentInfoJSON[player.continent].gold = playerInfo.gold - targetInfo.gold;
             continentInfoJSON[player.continent].military = playerInfo.military - targetInfo.military;
+            continentInfoJSON[player.continent].agriculture = playerInfo.agriculture - targetInfo.agriculture;
             console.log("after", continentInfoJSON[player.continent].military);
             continentsInfoPacakge = JSON.stringify(continentInfoJSON);
         }

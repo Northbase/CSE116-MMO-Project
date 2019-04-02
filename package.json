@@ -1,8 +1,13 @@
 {
-  "name": "pixelCiv",
+  "name": "pixel_civ",
   "version": "1.0.0",
-  "description": "",
+  "description": "<pre>\r <b>Controls:</b>\r W A S D: Camera Movement \r Q: Camera Zoom In\r E: Camera Zoom Out\r </pre>",
   "main": "src/MMO/main.js",
+  "dependencies": {
+    "electron": "^4.1.3",
+    "jquery": "^3.3.1"
+  },
+  "devDependencies": {},
   "scripts": {
     "start": "electron ."
   },
@@ -15,11 +20,5 @@
   "bugs": {
     "url": "https://github.com/jmacias11/MMO/issues"
   },
-  "homepage": "https://github.com/jmacias11/MMO#readme",
-  "dependencies": {
-    "electron": "^4.1.2",
-    "electron-json-storage": "^4.1.6",
-    "jquery": "^3.3.1",
-    "json": "^9.0.6"
-  }
+  "homepage": "https://github.com/jmacias11/MMO#readme"
 }

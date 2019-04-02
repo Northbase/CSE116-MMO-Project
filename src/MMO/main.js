@@ -13,7 +13,6 @@ app.on('ready', function() {
         frame: false,
         setFullScreen: true
     });
-    // window.setFullScreen(true);
     window.loadURL(url.format({
         pathname: path.join(__dirname, "FrontEnd/index.html"),
         protocol: 'file',
