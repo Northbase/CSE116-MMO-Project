@@ -13,6 +13,6 @@ class Game(var ContinentsInGame : List[Continent]) {
     }
   }
 
-  
+
 
 }
