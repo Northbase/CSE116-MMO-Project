@@ -1,6 +1,7 @@
-//package MMO.Backend.Classes
-import play.api.libs.json
+package MMO.Backend.Classes
+
 import play.api.libs.json.Json
+
 abstract class Continent(var Name: String, var Money: Int, var Troops: Int, var Resources: Int, var MoneyGrowth: Int, var TroopGrowth: Int, var ResourceGrowth: Int) {
 
   var troopsDefending : Int = 0
