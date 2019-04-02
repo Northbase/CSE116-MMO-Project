@@ -56,14 +56,14 @@ abstract class Continent(var Name: String, var Money: Int, var Troops: Int, var 
   }
   //puts all the properties in an array
   def toJson(): String = {
-    var money: String = Money.toString()
-    var troops: String = Troops.toString() //returns any, at least for me
-    var resources: String = Resources.toString()
-    var moneygrowth: String = MoneyGrowth.toString()
-    var troopgrowth: String = TroopGrowth.toString()
-    var resourcegrowth: String = ResourceGrowth.toString
-    var Arr: Array[String] = Array(Name, money, troops, resources, moneygrowth, troopgrowth, resourcegrowth)
-    return Json.stringify(Json.toJson(Arr))
+    val money: String = Money.toString()
+    val troops: String = Troops.toString() //returns any, at least for me
+    val resources: String = Resources.toString()
+    val moneyGrowth: String = MoneyGrowth.toString()
+    val troopGrowth: String = TroopGrowth.toString()
+    val resourceGrowth: String = ResourceGrowth.toString
+    val Arr: Array[String] = Array(Name, money, troops, resources, moneyGrowth, troopGrowth, resourceGrowth)
+    Json.stringify(Json.toJson(Arr))
   }
 
 
