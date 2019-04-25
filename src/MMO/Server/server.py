@@ -23,7 +23,4 @@ def static_files(filename):
 
 
 if __name__ == "__main__":
-    app.run()
-
-
-# socket_server.run(app, port=8080)
+    app.run(port=8080, debug=True)

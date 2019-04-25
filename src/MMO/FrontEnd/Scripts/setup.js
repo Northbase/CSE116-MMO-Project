@@ -1,5 +1,3 @@
-const $ = require("jquery");
-
 const Application = PIXI.Application;
 const Container = PIXI.Container;
 const Sprite = PIXI.Sprite;
@@ -9,6 +7,7 @@ const Texture = PIXI.Texture;
 const Text = PIXI.Text;
 const loader = PIXI.loader;
 const resources = PIXI.loader.resources;
+
 
 $.get("test.json", function(data) {
     window.continentsInfoPacakge = data;
@@ -40,7 +39,7 @@ function setup() {
     ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     var GUIborder = [40, 30]; //40px horizontal gap; 30px vertical gap (from top left corner)
-    var MAPborder = [835, 500]; //870 px horizontal gap; 490px veritcal gap (from top left corner)
+    var MAPborder = [835, 500]; //870 px horizontal gap; 490px vertical gap (from top left corner)
 
     var tilemap = TextureCache["textures/tilemap.png"];
     var sand_rect = new Texture(tilemap, new Rectangle(0, 0, 250, 250));
@@ -388,9 +387,7 @@ function setup() {
                 var continentNum = mapRegionMatrix[mouseXY[1]][mouseXY[0]];
             }
 
-            var regionInfo = {
-                "location": {}
-            };
+            var regionInfo = {"location": {}};
 
             var continentInfoJSON = JSON.parse(continentsInfoPacakge);
 
