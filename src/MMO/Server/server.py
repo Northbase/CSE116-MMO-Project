@@ -14,10 +14,16 @@ socket_server = SocketIO(app)
 
 @app.route('/')
 def index():
-    return send_from_directory('static', 'index.html')
+    return send_from_directory('../FrontEnd', 'index.html')
 
-# if app "__main__":
-#     app.run()
+
+@app.route('/<path:filename>')
+def static_files(filename):
+    return send_from_directory('../FrontEnd', filename)
+
+
+if __name__ == "__main__":
+    app.run()
 
 
 # socket_server.run(app, port=8080)
