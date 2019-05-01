@@ -13,6 +13,9 @@ eventlet.monkey_patch()
 app = Flask(__name__, template_folder="../FrontEnd/templates", static_folder="../FrontEnd/static")
 socket_server = SocketIO(app)
 
+usernameToSid = {}
+sidToUsername = {}
+
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect(('localhost', 8000))
 
@@ -51,6 +54,16 @@ def got_message():
 def disconnect():
     print(request.sid + " disconnected")
     message = {"username": request.sid, "action": "disconnected"}
+    send_to_server(message)
+
+
+@socket_server.on('register')
+def register():
+    print("registered.")
+    # usernameToSid[username] = request.sid
+    # sidToUsername[request.sid] = username
+    # print(username + " connected")
+    message = {"username": request.sid, "action": "registering..."}
     send_to_server(message)
 
 

@@ -10,6 +10,11 @@ const resources = PIXI.loader.resources;
 
 var socket = io.connect({transports: ['websocket']});
 
+function registerUser() {
+    socket.emit("register"); // send "register" to the server
+}
+
+
 // socket.on('connect', function(event) {
 // });
 
@@ -35,6 +40,7 @@ loader
     .add("textures/tilemap.png")
     .add("textures/GUI.png")
     .load(setup);
+
 
 function setup() {
 
