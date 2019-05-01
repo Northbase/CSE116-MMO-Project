@@ -8,9 +8,16 @@ const Text = PIXI.Text;
 const loader = PIXI.loader;
 const resources = PIXI.loader.resources;
 
+var socket = io.connect({transports: ['websocket']});
+
+// socket.on('connect', function(event) {
+// });
+
+// socket.on('message', function(event) {
+// });
 
 $.get("test.json", function(data) {
-    window.continentsInfoPacakge = data;
+    window.continentsInfoPackage = data;
 });
 
 
@@ -83,7 +90,8 @@ function setup() {
     playButton.height = 90;
     playButton.interactive = true;
     playButton.buttonMode = true;
-    playButton.on("click", ()=> { // eventually send request to server
+    playButton.on("click", ()=> {
+        socket.emit("play"); // send "play" to the server
         state = play; // set state to play
         window.player = { // generate player id ... it should be randomized in future
             "name": "player1",
@@ -159,8 +167,10 @@ function setup() {
     pressAttack.position.set(GUIborder[0]+380, GUIborder[1]+560);
     pressAttack.width = 60;
     pressAttack.height = 60;
-    pressAttack.on("click", ()=> { // calculation should be handled in back-end
-        var continentInfoJSON = JSON.parse(continentsInfoPacakge);
+    pressAttack.on("click", ()=> {
+        // var continentInfoJSON = JSON.parse(continentsInfoPackage);
+        socket.emit("attack"); // send "attack" to the server
+        var continentInfoJSON = continentsInfoPackage;
         var playerInfo = continentInfoJSON[player.continent];
         var targetInfoArr = event_broadcast.text.split("\n");
         var targetInfo = {"continent": targetInfoArr[0], "gold": targetInfoArr[1], "military": targetInfoArr[2], "agriculture": targetInfoArr[3]};
@@ -170,7 +180,7 @@ function setup() {
             continentInfoJSON[player.continent].military = playerInfo.military - targetInfo.military;
             continentInfoJSON[player.continent].agriculture = playerInfo.agriculture - targetInfo.agriculture;
             console.log("after", continentInfoJSON[player.continent].military);
-            continentsInfoPacakge = JSON.stringify(continentInfoJSON);
+            // continentsInfoPackage = JSON.stringify(continentInfoJSON);
         }
     });
     GUI_component.addChild(pressAttack);
@@ -181,8 +191,10 @@ function setup() {
     pressDefend.position.set(GUIborder[0]+380, GUIborder[1]+620);
     pressDefend.width = 60;
     pressDefend.height = 60;
-    pressDefend.on("click", ()=> { // calculation should be handled in back-end
-        var continentInfoJSON = JSON.parse(continentsInfoPacakge);
+    pressDefend.on("click", ()=> {
+        // var continentInfoJSON = JSON.parse(continentsInfoPackage);
+        socket.emit("defend"); // send "defend" to the server
+        var continentInfoJSON = continentsInfoPackage;
         var playerInfo = continentInfoJSON[player.continent];
         var targetInfoArr = event_broadcast.text.split("\n");
         var targetInfo = {"continent": targetInfoArr[0], "gold": targetInfoArr[1], "military": targetInfoArr[2], "agriculture": targetInfoArr[3]};
@@ -192,7 +204,7 @@ function setup() {
             continentInfoJSON[player.continent].military = playerInfo.military - targetInfo.military;
             continentInfoJSON[player.continent].agriculture = playerInfo.agriculture - targetInfo.agriculture;
             console.log("after", continentInfoJSON[player.continent].military);
-            continentsInfoPacakge = JSON.stringify(continentInfoJSON);
+            // continentsInfoPackage = JSON.stringify(continentInfoJSON);
         }
     });
     GUI_component.addChild(pressDefend);
@@ -389,7 +401,8 @@ function setup() {
 
             var regionInfo = {"location": {}};
 
-            var continentInfoJSON = JSON.parse(continentsInfoPacakge);
+            // var continentInfoJSON = JSON.parse(continentsInfoPackage);
+            var continentInfoJSON = continentsInfoPackage;
 
             switch(continentNum) {
                 case 0:
@@ -434,7 +447,7 @@ function setup() {
     setInterval(function() { // update states of all continents every second
         $.get("test.json", function(data) {
             // console.log(data);
-            continentsInfoPacakge = data;
+            continentsInfoPackage = data;
         });
     }, 1000);
 
@@ -467,11 +480,14 @@ function play(delta, state) {
 function updateStats(player) {
     var playerContinent = player.continent;
 
-    var continentInfoJSON = JSON.parse(continentsInfoPacakge);
+    // var continentInfoJSON = JSON.parse(continentsInfoPackage);
+    var continentInfoJSON = continentsInfoPackage;
 
     gold_magnitude.text = continentInfoJSON[playerContinent].gold;
     military_magnitude.text = continentInfoJSON[playerContinent].military;
     agriculture_magnitude.text = continentInfoJSON[playerContinent].agriculture;
+
+    // console.log(continentInfoJSON[playerContinent].gold)
 }
 
 function updateTileSelection(state) {

@@ -31,14 +31,14 @@ class TCPserver extends Actor {
       println("disconnected: " + sender())
       this.clients = this.clients - sender()
     case r: Received =>
-      println(r.data.utf8String)
-    case test =>
+      println("Received: " + r.data.utf8String)
+//    case test =>
 
   }
 
 }
 
-object TCPSocketServer {
+object TCPserver {
 
   def main(args: Array[String]): Unit = {
     val actorSystem = ActorSystem()
@@ -49,7 +49,7 @@ object TCPSocketServer {
 
     val server = actorSystem.actorOf(Props(classOf[TCPserver]))
 
-    actorSystem.scheduler.schedule(0 milliseconds, 100 milliseconds, server, test)
+//    actorSystem.scheduler.schedule(0 milliseconds, 100 milliseconds, server, test)
   }
 
 }

@@ -11,7 +11,7 @@ app.on('ready', function() {
         height: 720,
         zoom: 0.8,
         frame: false,
-        setFullScreen: true
+        setFullScreen: true,
     });
     window.loadURL(url.format({
         pathname: path.join(__dirname, "FrontEnd/index.html"),

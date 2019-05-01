@@ -1,9 +1,8 @@
-
+import json
 import socket
-
 from threading import Thread
-
 from random import randint
+
 from flask import Flask, send_from_directory, request, render_template
 from flask_socketio import SocketIO
 
@@ -17,10 +16,9 @@ socket_server = SocketIO(app)
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect(('localhost', 8000))
 
-delimiter = "~"
-
 
 def listen_to_server(the_socket):
+    delimiter = "~"
     buffer = ""
     while True:
         buffer += the_socket.recv(1024).decode()
@@ -30,29 +28,49 @@ def listen_to_server(the_socket):
             get_from_server(message)
 
 
-def get_from_server(data):
-    socket_server.emit("test", data, broadcast=True)
-
-
 Thread(target=listen_to_server, args=(s,)).start()
 
 
+def get_from_server(data):
+    print(data)
+    # socket_server.emit("test", data, broadcast=True)
+
+
 def send_to_server(data):
-    s.sendall("hello".encode())
+    s.sendall(json.dumps(data).encode())
 
 
 @socket_server.on('connect')
 def got_message():
     print(request.sid + " connected")
     message = {"username": request.sid, "action": "connected"}
-    send_to_server("hello")
+    send_to_server(message)
 
 
 @socket_server.on('disconnect')
 def disconnect():
     print(request.sid + " disconnected")
     message = {"username": request.sid, "action": "disconnected"}
-    send_to_scala("bye")
+    send_to_server(message)
+
+
+@socket_server.on('play')
+def play():
+    message = {"username": request.sid, "action": "play"}
+    send_to_server(message)
+
+
+@socket_server.on('attack')
+def play():
+    message = {"username": request.sid, "action": "attack"}
+    send_to_server(message)
+
+
+@socket_server.on('defend')
+def play():
+    message = {"username": request.sid, "action": "defend"}
+    send_to_server(message)
+
 
 
 @app.route('/')
