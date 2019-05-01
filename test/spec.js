@@ -15,7 +15,7 @@ this.app = new Application({
             //     |__ ...
             //     |__ main.js
             //     |__ package.json
-            //     |__ index.html
+            //     |__ game.html
             //     |__ ...
             //     |__ test
             //        |__ spec.js  <- You are here! ~ Well you should be.
@@ -63,7 +63,7 @@ app.start().then(function () {
 //             //     |__ ...
 //             //     |__ main.js
 //             //     |__ package.json
-//             //     |__ index.html
+//             //     |__ game.html
 //             //     |__ ...
 //             //     |__ test
 //             //        |__ spec.js  <- You are here! ~ Well you should be.

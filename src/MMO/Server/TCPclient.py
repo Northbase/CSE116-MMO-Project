@@ -10,7 +10,7 @@ import eventlet
 
 eventlet.monkey_patch()
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="../FrontEnd/templates", static_folder="../FrontEnd/static")
 socket_server = SocketIO(app)
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -75,12 +75,22 @@ def play():
 
 @app.route('/')
 def index():
-    return send_from_directory('../FrontEnd', 'index.html')
+    return send_from_directory('../FrontEnd/templates', 'index.html')
 
 
 @app.route('/<path:filename>')
 def static_files(filename):
-    return send_from_directory('../FrontEnd', filename)
+    return send_from_directory('../FrontEnd/static', filename)
+
+
+@app.route('/game', methods=["POST", "GET"])
+def game():
+    if request.method == "POST":
+        username = request.form.get('username')
+    else:
+        username = "guest" + str(randint(0, 100000))
+    # return send_from_directory('../FrontEnd/templates', 'game.html', username=username)
+    return render_template('game.html', username=username)
 
 
 if __name__ == "__main__":

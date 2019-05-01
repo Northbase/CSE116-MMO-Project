@@ -8,7 +8,7 @@ import akka.io.{IO, Tcp}
 import akka.util.ByteString
 import play.api.libs.json.{JsValue, Json}
 
-case object test
+case class GameState(gameState: String)
 
 class TCPserver extends Actor {
   import Tcp._
@@ -17,6 +17,7 @@ class TCPserver extends Actor {
   IO(Tcp) ! Bind(self, new InetSocketAddress("localhost", 8000))
 
   var clients: Set[ActorRef] = Set()
+  var gameActors = scala.collection.mutable.Map[String, ActorRef]()
   var buffer: String = ""
   val delimiter: String = "~"
 
@@ -32,8 +33,11 @@ class TCPserver extends Actor {
       this.clients = this.clients - sender()
     case r: Received =>
       println("Received: " + r.data.utf8String)
-//    case test =>
-
+      val JSONdata: JsValue = Json.parse(r.data.utf8String)
+      val username: String = (JSONdata \ "username").as[String]
+      val action: String = (JSONdata \ "action").as[String]
+    case gs: GameState =>
+      this.clients.foreach((client: ActorRef) => client ! Write(ByteString(gs.gameState + "~")))
   }
 
 }

@@ -14,7 +14,7 @@ app.on('ready', function() {
         setFullScreen: true,
     });
     window.loadURL(url.format({
-        pathname: path.join(__dirname, "FrontEnd/index.html"),
+        pathname: path.join(__dirname, "FrontEnd/templates/index.html"),
         protocol: 'file',
         slashes: true
     }));
