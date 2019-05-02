@@ -45,11 +45,11 @@ def send_to_server(data):
     s.sendall(json.dumps(data).encode())
 
 
-@socket_server.on('connect')
-def connect():
-    print(request.sid + " connected")
-    message = {"username": request.sid, "action": "connected"}
-    send_to_server(message)
+# @socket_server.on('connect')
+# def connect():
+#     print(request.sid + " connected")
+#     message = {"username": request.sid, "action": "connected"}
+#     send_to_server(message)
 
 
 @socket_server.on('disconnect')
@@ -91,7 +91,6 @@ def play():
     send_to_server(message)
 
 
-
 @app.route('/')
 def index():
     return send_from_directory('../FrontEnd/templates', 'index.html')
@@ -110,7 +109,6 @@ def game():
         username = "guest" + str(randint(0, 100000))
     # return send_from_directory('../FrontEnd/templates', 'game.html', username=username)
     return render_template('game.html', username=username)
-
 
 
 socket_server.run(app, port=8080, debug="true")

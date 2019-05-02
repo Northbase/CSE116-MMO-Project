@@ -10,7 +10,7 @@ case object Attack
 case object Defend
 
 class GameActor(username: String) extends Actor {
-  // Game class is setup my the username
+  // Game class is setup by the username
   // continents are pulled from database...
   // continents are distributed to players in chronological order ...
 

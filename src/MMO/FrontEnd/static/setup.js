@@ -8,7 +8,7 @@ const Text = PIXI.Text;
 const loader = PIXI.loader;
 const resources = PIXI.loader.resources;
 
-var socket = io.connect({transports: ['websocket']});
+let socket = io.connect({transports: ['websocket']});
 
 function registerUser(username) {
     socket.emit("register", username); // send "register" to the server
@@ -26,7 +26,7 @@ $.get("test.json", function(data) {
 });
 
 
-var app = new Application({
+let app = new Application({
     width: 1280,
     height: 720,
     antialias: true,
@@ -40,6 +40,10 @@ loader
     .add("textures/tilemap.png")
     .add("textures/GUI.png")
     .load(setup);
+
+var continents = ["North America", "South America", "Africa", "Europe", "Asia", "Australia", "Antarctica"];
+var currentRoom = null;
+var currentContinent = null;
 
 
 function setup() {
@@ -62,10 +66,8 @@ function setup() {
     var ice_rect = new Texture(tilemap, new Rectangle(1000, 0, 250, 250));
     var dirt_rect = new Texture(tilemap, new Rectangle(1250, 0, 250, 250));
 
-    var empty_rect = new Texture(tilemap, new Rectangle(0, 250, 250, 250));
-
     var GUI = TextureCache["textures/GUI.png"];
-    var map_rect = new Texture(GUI, new Rectangle(0, 0, 250, 250));
+    var empty_rect = new Texture(GUI, new Rectangle(0, 0, 250, 250));
     var eventBox_rect = new Texture(GUI, new Rectangle(250, 0, 250, 250));
     var profile_rect = new Texture(GUI, new Rectangle(500, 0, 250, 250));
     var gold_stat_rect = new Texture(GUI, new Rectangle(750, 0, 250, 250));
@@ -76,10 +78,15 @@ function setup() {
 
     var playButton_rect = new Texture(GUI, new Rectangle(0, 250, 250, 250));
     var logo_rect = new Texture(GUI, new Rectangle(250, 250, 500, 250));
+    var joinButton_rect = new Texture(GUI, new Rectangle(750, 250, 250, 250));
+    var start_rect = new Texture(GUI, new Rectangle(1005, 250, 250, 250));
 
-    var TILEMAP_component = new Container();
-    var GUI_component = new Container();
+    // components
     var MAIN_MENU_component = new Container();
+    var ROOM_SELECT_component = new Container();
+    var CONTINENT_SELECT_component = new Container();
+    var GUI_component = new Container();
+    var TILEMAP_component = new Container();
 
     /************************************* GUI ***************************************************************/
     var logo = new Sprite(logo_rect);
@@ -89,7 +96,77 @@ function setup() {
     logo.position.set(app.screen.width/2, app.screen.height/2);
     MAIN_MENU_component.addChild(logo);
 
+    var startButton = new Sprite(start_rect);
+    startButton.anchor.set(0.5, 0.5);
+    startButton.position.set(app.screen.width/2, app.screen.height/2 + 150);
+    startButton.width = 90;
+    startButton.height = 90;
+    startButton.interactive = true;
+    startButton.buttonMode = true;
+    startButton.on("click", ()=> {
+        state = roomSelect;
+        for(var i = 0; i < 4; i++) {
+            createRoom(i);
+        }
+    });
+    MAIN_MENU_component.addChild(startButton);
+
+    var joinButton = new Sprite(joinButton_rect);
+    joinButton.tint = "0xe1e6ed";
+    joinButton.interactive = true;
+    joinButton.buttonMode = true;
+    joinButton.anchor.set(0.5, 0.5);
+    joinButton.width = 90;
+    joinButton.height = 90;
+    joinButton.position.set(app.screen.width/2, app.screen.height/2  + 250);
+    joinButton.on("click", () => {
+        state = continentSelect;
+        for(var i = 0; i < continents.length; i++) {
+            selectContinent(currentRoom, i);
+        }
+     });
+    ROOM_SELECT_component.addChild(joinButton);
+
+    function createRoom(roomSerialNumber) {
+        var room = new Sprite(empty_rect);
+        room.tint = "0xe1e6ed";
+        room.interactive = true;
+        room.buttonMode = true;
+        room.anchor.set(0.5, 0.5);
+        room.width = 250;
+        room.height = 250;
+        room.position.set(250 + (roomSerialNumber) * 260, 300);
+        room.on("click", () => {
+            currentRoom = roomSerialNumber;
+
+            ROOM_SELECT_component.children.forEach( c => { c.tint = "0xe1e6ed"; });
+            room.tint = "0xc4b5a6";
+            console.log(currentRoom);
+        });
+        ROOM_SELECT_component.addChild(room);
+    }
+
+    function selectContinent(roomNumber, continentSerialNumber) {
+        var continentGrid = new Sprite(empty_rect);
+        continentGrid.tint = "0xe1e6ed";
+        continentGrid.interactive = true;
+        continentGrid.buttonMode = true;
+        continentGrid.anchor.set(0.5, 0.5);
+        continentGrid.width = 150;
+        continentGrid.height = 150;
+        continentGrid.position.set(180 + continentSerialNumber * 155, 300);
+        continentGrid.on("click", () => {
+            currentContinent = continents[continentSerialNumber];
+
+            CONTINENT_SELECT_component.children.forEach( c => { c.tint = "0xe1e6ed"; });
+            continentGrid.tint = "0xc4b5a6";
+            console.log(roomNumber, currentContinent);
+        });
+        CONTINENT_SELECT_component.addChild(continentGrid);
+    }
+
     var playButton = new Sprite(playButton_rect);
+    playButton.tint = "0xe1e6ed";
     playButton.anchor.set(0.5, 0.5);
     playButton.position.set(app.screen.width/2, app.screen.height/2 + 150);
     playButton.width = 90;
@@ -98,16 +175,13 @@ function setup() {
     playButton.buttonMode = true;
     playButton.on("click", ()=> {
         socket.emit("play"); // send "play" to the server
-        state = play; // set state to play
+
         // window.player = { // generate player id ... it should be randomized in future
         //     "name": "player1",
         //     "continent": "Antarctica"
         // };
-        // app.stage.children [0].visible = true; // allow rendering TILEMAP
-        // app.stage.children[1].visible = true; // allow rendering GUI
-        // app.stage.children[2].visible = false;// prevent mainMenu from rendering
     });
-    MAIN_MENU_component.addChild(playButton);
+    CONTINENT_SELECT_component.addChild(playButton);
 
     var profile = new Sprite(profile_rect);
     profile.position.set(GUIborder[0], GUIborder[1]+590);
@@ -215,7 +289,7 @@ function setup() {
     });
     GUI_component.addChild(pressDefend);
 
-    var map = new Sprite(map_rect);
+    var map = new Sprite(empty_rect);
     map.position.set(GUIborder[0]+790, GUIborder[1]+465);
     map.width = 410;
     map.height = 205;
@@ -448,7 +522,7 @@ function setup() {
 
     window.state = mainMenu;
 
-    setInterval(function() { // update states of all continents every second
+    setInterval(function() { // receive game state for 1 ms interval
         $.get("test.json", function(data) {
             // console.log(data);
             continentsInfoPackage = data;
@@ -458,6 +532,9 @@ function setup() {
     app.stage.addChild(TILEMAP_component);
     app.stage.addChild(GUI_component);
     app.stage.addChild(MAIN_MENU_component);
+    app.stage.addChild(ROOM_SELECT_component);
+    app.stage.addChild(CONTINENT_SELECT_component);
+
     // app.renderer.render(app.stage);
     app.ticker.add(delta => gameLoop(delta, state));
 }
@@ -470,19 +547,35 @@ function gameLoop(delta, state) {
 function mainMenu(delta, state) {
     app.stage.children[0].visible = false; // prevent TILEMAP from rendering
     app.stage.children[1].visible = false; // prevent GUI from rendering
-    // var renderObject = app.stage.children[0];
-
-    // TILEMAP_component.renderable = false;
-    // TILEMAP_component.visible = false;
-    // GUI_component.destroy();
+    app.stage.children[2].visible = true; // allow rendering mainMenu
+    app.stage.children[3].visible = false; // prevent ROOM_SELECT from rendering
+    app.stage.children[4].visible = false; // prevent CONTINENT_SELECT from rendering
 
     app.renderer.render(app.stage);
+}
+
+function roomSelect(delta, state) {
+    app.stage.children[0].visible = false; // prevent TILEMAP from rendering
+    app.stage.children[1].visible = false; // prevent GUI from rendering
+    app.stage.children[2].visible = false; // prevent mainMenu from rendering
+    app.stage.children[3].visible = true; // allow rendering ROOM_SELECT
+    app.stage.children[4].visible = false; // prevent CONTINENT_SELECT from rendering
+}
+
+function continentSelect(data, state) {
+    app.stage.children[0].visible = false; // prevent TILEMAP from rendering
+    app.stage.children[1].visible = false; // prevent GUI from rendering
+    app.stage.children[2].visible = false; // prevent mainMenu from rendering
+    app.stage.children[3].visible = false; // prevent ROOM_SELECT from rendering
+    app.stage.children[4].visible = true; // allow rendering CONTINENT_SELECT
 }
 
 function play(delta, state) {
     app.stage.children[0].visible = true; // allow rendering TILEMAP
     app.stage.children[1].visible = true; // allow rendering GUI
     app.stage.children[2].visible = false;// prevent mainMenu from rendering
+    app.stage.children[3].visible = false; // prevent ROOM_SELECT from rendering
+    app.stage.children[4].visible = false; // prevent CONTINENT_SELECT from rendering
 
     updateStats(player);
     updateTileSelection(state);
