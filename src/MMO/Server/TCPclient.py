@@ -58,12 +58,12 @@ def disconnect():
 
 
 @socket_server.on('register')
-def register():
-    print("registered.")
+def register(username):
+    print(username + "registered")
     # usernameToSid[username] = request.sid
     # sidToUsername[request.sid] = username
     # print(username + " connected")
-    message = {"username": request.sid, "action": "registering..."}
+    message = {"username": username, "action": "registering..."}
     send_to_server(message)
 
 

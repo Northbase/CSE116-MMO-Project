@@ -10,8 +10,8 @@ const resources = PIXI.loader.resources;
 
 var socket = io.connect({transports: ['websocket']});
 
-function registerUser() {
-    socket.emit("register"); // send "register" to the server
+function registerUser(username) {
+    socket.emit("register", username); // send "register" to the server
 }
 
 
@@ -451,7 +451,7 @@ function setup() {
     window.state = mainMenu; // set state as "play"
 
     setInterval(function() { // update states of all continents every second
-        $.get("test.json", function(data) {
+        $.get("MMO.FrontEnd.static.test.json", function(data) {
             // console.log(data);
             continentsInfoPackage = data;
         });
