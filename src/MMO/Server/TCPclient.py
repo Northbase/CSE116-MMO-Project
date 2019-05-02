@@ -15,6 +15,7 @@ socket_server = SocketIO(app)
 
 usernameToSid = {}
 sidToUsername = {}
+lobby = {}
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect(('localhost', 8000))
@@ -36,6 +37,7 @@ Thread(target=listen_to_server, args=(s,)).start()
 
 def get_from_server(data):
     print(data)
+    # message = json.loads(data)
     # socket_server.emit("test", data, broadcast=True)
 
 
@@ -44,7 +46,7 @@ def send_to_server(data):
 
 
 @socket_server.on('connect')
-def got_message():
+def connect():
     print(request.sid + " connected")
     message = {"username": request.sid, "action": "connected"}
     send_to_server(message)
@@ -53,17 +55,21 @@ def got_message():
 @socket_server.on('disconnect')
 def disconnect():
     print(request.sid + " disconnected")
-    message = {"username": request.sid, "action": "disconnected"}
-    send_to_server(message)
+    if request.sid in sidToUsername:
+        username = sidToUsername[request.sid]
+        del sidToUsername[request.sid]
+        del usernameToSid[username]
+        message = {"username": request.sid, "action": "disconnected"}
+        send_to_server(message)
 
 
 @socket_server.on('register')
 def register(username):
-    print(username + "registered")
-    # usernameToSid[username] = request.sid
-    # sidToUsername[request.sid] = username
-    # print(username + " connected")
-    message = {"username": username, "action": "registering..."}
+    print(username + " registered")
+    usernameToSid[username] = request.sid
+    sidToUsername[request.sid] = username
+    message = {"username": username, "action": "registered"}
+    print(usernameToSid)
     send_to_server(message)
 
 
@@ -106,7 +112,9 @@ def game():
     return render_template('game.html', username=username)
 
 
-if __name__ == "__main__":
-    socket_server.run(app, port=8080, debug="true")
-    # app.run(port=8080, debug=True)
+
+socket_server.run(app, port=8080, debug="true")
+
+# if __name__ == "__main__":
+#     socket_server.run(app, port=8080, debug="true")
 

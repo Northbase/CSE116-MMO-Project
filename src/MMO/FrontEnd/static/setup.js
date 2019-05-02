@@ -14,12 +14,12 @@ function registerUser(username) {
     socket.emit("register", username); // send "register" to the server
 }
 
-
 // socket.on('connect', function(event) {
 // });
 
 // socket.on('message', function(event) {
 // });
+
 
 $.get("test.json", function(data) {
     window.continentsInfoPackage = data;
@@ -99,13 +99,13 @@ function setup() {
     playButton.on("click", ()=> {
         socket.emit("play"); // send "play" to the server
         state = play; // set state to play
-        window.player = { // generate player id ... it should be randomized in future
-            "name": "player1",
-            "continent": "Antarctica"
-        };
-        app.stage.children[0].visible = true; // allow rendering TILEMAP
-        app.stage.children[1].visible = true; // allow rendering GUI
-        app.stage.children[2].visible = false;// prevent mainMenu from rendering
+        // window.player = { // generate player id ... it should be randomized in future
+        //     "name": "player1",
+        //     "continent": "Antarctica"
+        // };
+        // app.stage.children [0].visible = true; // allow rendering TILEMAP
+        // app.stage.children[1].visible = true; // allow rendering GUI
+        // app.stage.children[2].visible = false;// prevent mainMenu from rendering
     });
     MAIN_MENU_component.addChild(playButton);
 
@@ -176,18 +176,18 @@ function setup() {
     pressAttack.on("click", ()=> {
         // var continentInfoJSON = JSON.parse(continentsInfoPackage);
         socket.emit("attack"); // send "attack" to the server
-        var continentInfoJSON = continentsInfoPackage;
-        var playerInfo = continentInfoJSON[player.continent];
-        var targetInfoArr = event_broadcast.text.split("\n");
-        var targetInfo = {"continent": targetInfoArr[0], "gold": targetInfoArr[1], "military": targetInfoArr[2], "agriculture": targetInfoArr[3]};
-        if(targetInfo.continent != player.continent && (targetInfo.continent != "" || targetInfo.continent != "Uncalimed")) {// prevent attacking own continent and unclaimed continent
-            console.log("before",continentInfoJSON[player.continent].military);
-            continentInfoJSON[player.continent].gold = playerInfo.gold - targetInfo.gold;
-            continentInfoJSON[player.continent].military = playerInfo.military - targetInfo.military;
-            continentInfoJSON[player.continent].agriculture = playerInfo.agriculture - targetInfo.agriculture;
-            console.log("after", continentInfoJSON[player.continent].military);
-            // continentsInfoPackage = JSON.stringify(continentInfoJSON);
-        }
+        // var continentInfoJSON = continentsInfoPackage;
+        // var playerInfo = continentInfoJSON[player.continent];
+        // var targetInfoArr = event_broadcast.text.split("\n");
+        // var targetInfo = {"continent": targetInfoArr[0], "gold": targetInfoArr[1], "military": targetInfoArr[2], "agriculture": targetInfoArr[3]};
+        // if(targetInfo.continent != player.continent && (targetInfo.continent != "" || targetInfo.continent != "Uncalimed")) {// prevent attacking own continent and unclaimed continent
+        //     console.log("before",continentInfoJSON[player.continent].military);
+        //     continentInfoJSON[player.continent].gold = playerInfo.gold - targetInfo.gold;
+        //     continentInfoJSON[player.continent].military = playerInfo.military - targetInfo.military;
+        //     continentInfoJSON[player.continent].agriculture = playerInfo.agriculture - targetInfo.agriculture;
+        //     console.log("after", continentInfoJSON[player.continent].military);
+        //     // continentsInfoPackage = JSON.stringify(continentInfoJSON);
+        // }
     });
     GUI_component.addChild(pressAttack);
 
@@ -200,18 +200,18 @@ function setup() {
     pressDefend.on("click", ()=> {
         // var continentInfoJSON = JSON.parse(continentsInfoPackage);
         socket.emit("defend"); // send "defend" to the server
-        var continentInfoJSON = continentsInfoPackage;
-        var playerInfo = continentInfoJSON[player.continent];
-        var targetInfoArr = event_broadcast.text.split("\n");
-        var targetInfo = {"continent": targetInfoArr[0], "gold": targetInfoArr[1], "military": targetInfoArr[2], "agriculture": targetInfoArr[3]};
-        if(targetInfo.continent != player.continent && (targetInfo.continent != "" || targetInfo.continent != "Uncalimed")) { // prevent defending own continent and unclaimed continent
-            console.log("before",continentInfoJSON[player.continent].military);
-            continentInfoJSON[player.continent].gold = playerInfo.gold - targetInfo.gold;
-            continentInfoJSON[player.continent].military = playerInfo.military - targetInfo.military;
-            continentInfoJSON[player.continent].agriculture = playerInfo.agriculture - targetInfo.agriculture;
-            console.log("after", continentInfoJSON[player.continent].military);
-            // continentsInfoPackage = JSON.stringify(continentInfoJSON);
-        }
+        // var continentInfoJSON = continentsInfoPackage;
+        // var playerInfo = continentInfoJSON[player.continent];
+        // var targetInfoArr = event_broadcast.text.split("\n");
+        // var targetInfo = {"continent": targetInfoArr[0], "gold": targetInfoArr[1], "military": targetInfoArr[2], "agriculture": targetInfoArr[3]};
+        // if(targetInfo.continent != player.continent && (targetInfo.continent != "" || targetInfo.continent != "Uncalimed")) { // prevent defending own continent and unclaimed continent
+        //     console.log("before",continentInfoJSON[player.continent].military);
+        //     continentInfoJSON[player.continent].gold = playerInfo.gold - targetInfo.gold;
+        //     continentInfoJSON[player.continent].military = playerInfo.military - targetInfo.military;
+        //     continentInfoJSON[player.continent].agriculture = playerInfo.agriculture - targetInfo.agriculture;
+        //     console.log("after", continentInfoJSON[player.continent].military);
+        //     // continentsInfoPackage = JSON.stringify(continentInfoJSON);
+        // }
     });
     GUI_component.addChild(pressDefend);
 
@@ -359,7 +359,8 @@ function setup() {
         window.dx = 0;
         window.dy = 0;
 
-        window.addEventListener("keydown", function(event) { // keyboard input
+        // keyboard input
+        window.addEventListener("keydown", function(event) {
             var columnEndPoint = Math.floor(585/zoomLevel);
             var rowEndPoint = Math.floor(1200/zoomLevel);
             var dxLimit = mapTextureMatrix[0].length-rowEndPoint;
@@ -400,7 +401,8 @@ function setup() {
             continentMapping(TILEMAP_component, GUIborder, zoomLevel, 0xc4b5a6, dx, dy);
         });
 
-        window.addEventListener("click", function() { // mouse interaction
+        // mouse interaction
+        window.addEventListener("click", function() {
             if(state == play && (mouseXY[0] != null && mouseXY[1] != null)) { // if mouse is out of tilemap, don't execute
                 var continentNum = mapRegionMatrix[mouseXY[1]][mouseXY[0]];
             }
@@ -444,14 +446,10 @@ function setup() {
 
     /********************************** preliminary setup for gameloop ************************************************************/
 
-        // TILEMAP_component.renderable = false;
-        // TILEMAP_component.visible = false;
-        // GUI_component.destroy();
-
-    window.state = mainMenu; // set state as "play"
+    window.state = mainMenu;
 
     setInterval(function() { // update states of all continents every second
-        $.get("MMO.FrontEnd.static.test.json", function(data) {
+        $.get("test.json", function(data) {
             // console.log(data);
             continentsInfoPackage = data;
         });
@@ -473,10 +471,19 @@ function mainMenu(delta, state) {
     app.stage.children[0].visible = false; // prevent TILEMAP from rendering
     app.stage.children[1].visible = false; // prevent GUI from rendering
     // var renderObject = app.stage.children[0];
+
+    // TILEMAP_component.renderable = false;
+    // TILEMAP_component.visible = false;
+    // GUI_component.destroy();
+
     app.renderer.render(app.stage);
 }
 
 function play(delta, state) {
+    app.stage.children[0].visible = true; // allow rendering TILEMAP
+    app.stage.children[1].visible = true; // allow rendering GUI
+    app.stage.children[2].visible = false;// prevent mainMenu from rendering
+
     updateStats(player);
     updateTileSelection(state);
 }
@@ -492,8 +499,6 @@ function updateStats(player) {
     gold_magnitude.text = continentInfoJSON[playerContinent].gold;
     military_magnitude.text = continentInfoJSON[playerContinent].military;
     agriculture_magnitude.text = continentInfoJSON[playerContinent].agriculture;
-
-    // console.log(continentInfoJSON[playerContinent].gold)
 }
 
 function updateTileSelection(state) {

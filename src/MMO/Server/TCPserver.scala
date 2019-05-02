@@ -3,7 +3,7 @@ package MMO.Server
 import java.net.InetSocketAddress
 
 import play.api.libs.json
-import akka.actor.{Actor, ActorRef, ActorSystem, Props}
+import akka.actor.{Actor, ActorRef, ActorSystem, PoisonPill, Props}
 import akka.io.{IO, Tcp}
 import akka.util.ByteString
 import play.api.libs.json.{JsValue, Json}
@@ -36,6 +36,31 @@ class TCPserver extends Actor {
       val JSONdata: JsValue = Json.parse(r.data.utf8String)
       val username: String = (JSONdata \ "username").as[String]
       val action: String = (JSONdata \ "action").as[String]
+      val childActor: ActorRef = context.actorOf(Props(classOf[GameActor], username))
+
+      if(action == "connected") {
+        gameActors += (username -> childActor)
+        gameActors(username) ! Setup
+
+      }else if(action == "disconnected") {
+        gameActors(username) ! PoisonPill
+        gameActors -= username
+
+      }else if(action == "registered") {
+
+
+      }else if(action == "play") { // need a method that distributes continent to each client
+        println("players: " + clients)
+//        gameActors(username) !
+
+      }else if(action == "attack") {
+        gameActors(username) ! Attack
+
+      }else if(action == "defend") {
+        gameActors(username) ! Defend
+
+      }
+
     case gs: GameState =>
       this.clients.foreach((client: ActorRef) => client ! Write(ByteString(gs.gameState + "~")))
   }
