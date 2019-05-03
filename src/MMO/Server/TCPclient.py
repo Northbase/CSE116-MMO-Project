@@ -15,7 +15,10 @@ socket_server = SocketIO(app)
 
 usernameToSid = {}
 sidToUsername = {}
-lobby = {}
+
+usernameToGame = {}
+
+lobby = {"0": {}, "1": {}, "2": {}, "3": {}}
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect(('localhost', 8000))
@@ -36,7 +39,7 @@ Thread(target=listen_to_server, args=(s,)).start()
 
 
 def get_from_server(data):
-    print(data)
+    print("got: ", data)
     # message = json.loads(data)
     # socket_server.emit("test", data, broadcast=True)
 
@@ -45,49 +48,65 @@ def send_to_server(data):
     s.sendall(json.dumps(data).encode())
 
 
-# @socket_server.on('connect')
-# def connect():
-#     print(request.sid + " connected")
-#     message = {"username": request.sid, "action": "connected"}
-#     send_to_server(message)
-
-
-@socket_server.on('disconnect')
-def disconnect():
-    print(request.sid + " disconnected")
-    if request.sid in sidToUsername:
-        username = sidToUsername[request.sid]
-        del sidToUsername[request.sid]
-        del usernameToSid[username]
-        message = {"username": request.sid, "action": "disconnected"}
-        send_to_server(message)
-
-
 @socket_server.on('register')
 def register(username):
     print(username + " registered")
     usernameToSid[username] = request.sid
     sidToUsername[request.sid] = username
     message = {"username": username, "action": "registered"}
-    print(usernameToSid)
     send_to_server(message)
 
 
-@socket_server.on('play')
-def play():
-    message = {"username": request.sid, "action": "play"}
+@socket_server.on('disconnect')
+def disconnect():
+    if request.sid in sidToUsername:
+        username = sidToUsername[request.sid]
+        del sidToUsername[request.sid]
+        del usernameToSid[username]
+        for room, playersInRoom in lobby.items():
+            if username in playersInRoom:
+                del lobby[room][username]
+
+        message = {"username": username, "action": "disconnected"}
+        send_to_server(message)
+
+
+@socket_server.on('joinRoom')
+def join(data):
+    username = sidToUsername[request.sid]
+    if len(lobby[str(data["room"])]) < 7:
+        message = {"username": username, "action": "joinRoom", "status": "pass"}
+        lobby[str(data["room"])].update({username: data["continent"]})
+        print(lobby)
+    else:
+        message = {"username": username, "action": "joinRoom", "status": "fail"}
+    send_to_server(message)
+
+
+@socket_server.on('playGame')
+def play(data):
+    username = sidToUsername[request.sid]
+    occupiedContinent = lobby[str(data["room"])].values()
+    if data["continent"] not in occupiedContinent:
+        message = {"username": username, "action": "playGame", "status": "pass"}
+        lobby[str(data["room"])].update({username: data["continent"]})
+        print(lobby)
+    else:
+        message = {"username": username, "action": "playGame", "status": "fail"}
     send_to_server(message)
 
 
 @socket_server.on('attack')
 def play():
-    message = {"username": request.sid, "action": "attack"}
+    username = sidToUsername[request.sid]
+    message = {"username": username, "action": "attack"}
     send_to_server(message)
 
 
 @socket_server.on('defend')
 def play():
-    message = {"username": request.sid, "action": "defend"}
+    username = sidToUsername[request.sid]
+    message = {"username": username, "action": "defend"}
     send_to_server(message)
 
 
@@ -111,8 +130,6 @@ def game():
     return render_template('game.html', username=username)
 
 
-socket_server.run(app, port=8080, debug="true")
-
-# if __name__ == "__main__":
-#     socket_server.run(app, port=8080, debug="true")
+if __name__ == "__main__":
+    socket_server.run(app, port=8080, debug="true")
 

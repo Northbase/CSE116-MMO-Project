@@ -38,27 +38,29 @@ class TCPserver extends Actor {
       val action: String = (JSONdata \ "action").as[String]
       val childActor: ActorRef = context.actorOf(Props(classOf[GameActor], username))
 
-      if(action == "connected") {
+      if(action == "registered") {
         gameActors += (username -> childActor)
         gameActors(username) ! Setup
-
       }else if(action == "disconnected") {
         gameActors(username) ! PoisonPill
         gameActors -= username
+      }else if(action == "joinRoom") {
+        val status: String = (JSONdata \ "status").as[String]
+        if(status == "pass") {
 
-      }else if(action == "registered") {
+        }
 
-
-      }else if(action == "play") { // need a method that distributes continent to each client
-        println("players: " + clients)
-//        gameActors(username) !
-
+      }else if(action == "playGame") {
+        val status: String = (JSONdata \ "status").as[String]
+        if(status == "pass") {
+//          gameActors(username) !
+        }
+//        println("clients: " + clients)
+//        println("players: " + username)
       }else if(action == "attack") {
         gameActors(username) ! Attack
-
       }else if(action == "defend") {
         gameActors(username) ! Defend
-
       }
 
     case gs: GameState =>

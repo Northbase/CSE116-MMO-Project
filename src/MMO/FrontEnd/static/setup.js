@@ -41,9 +41,9 @@ loader
     .add("textures/GUI.png")
     .load(setup);
 
-var continents = ["North America", "South America", "Africa", "Europe", "Asia", "Australia", "Antarctica"];
-var currentRoom = null;
-var currentContinent = null;
+let continents = ["North America", "South America", "Africa", "Europe", "Asia", "Australia", "Antarctica"];
+let currentRoom = "";
+let currentContinent = "";
 
 
 function setup() {
@@ -111,22 +111,6 @@ function setup() {
     });
     MAIN_MENU_component.addChild(startButton);
 
-    var joinButton = new Sprite(joinButton_rect);
-    joinButton.tint = "0xe1e6ed";
-    joinButton.interactive = true;
-    joinButton.buttonMode = true;
-    joinButton.anchor.set(0.5, 0.5);
-    joinButton.width = 90;
-    joinButton.height = 90;
-    joinButton.position.set(app.screen.width/2, app.screen.height/2  + 250);
-    joinButton.on("click", () => {
-        state = continentSelect;
-        for(var i = 0; i < continents.length; i++) {
-            selectContinent(currentRoom, i);
-        }
-     });
-    ROOM_SELECT_component.addChild(joinButton);
-
     function createRoom(roomSerialNumber) {
         var room = new Sprite(empty_rect);
         room.tint = "0xe1e6ed";
@@ -145,6 +129,24 @@ function setup() {
         });
         ROOM_SELECT_component.addChild(room);
     }
+
+    var joinButton = new Sprite(joinButton_rect);
+    joinButton.tint = "0xe1e6ed";
+    joinButton.interactive = true;
+    joinButton.buttonMode = true;
+    joinButton.anchor.set(0.5, 0.5);
+    joinButton.width = 90;
+    joinButton.height = 90;
+    joinButton.position.set(app.screen.width/2, app.screen.height/2  + 250);
+    joinButton.on("click", () => {
+        socket.emit("joinRoom", {"room": currentRoom, "continent": currentContinent}); // send "join" to the server
+
+        state = continentSelect;
+        for(var i = 0; i < continents.length; i++) {
+            selectContinent(currentRoom, i);
+        }
+    });
+    ROOM_SELECT_component.addChild(joinButton);
 
     function selectContinent(roomNumber, continentSerialNumber) {
         var continentGrid = new Sprite(empty_rect);
@@ -174,7 +176,7 @@ function setup() {
     playButton.interactive = true;
     playButton.buttonMode = true;
     playButton.on("click", ()=> {
-        socket.emit("play"); // send "play" to the server
+        socket.emit("playGame", {"room": currentRoom, "continent": currentContinent}); // send "play" to the server
 
         // window.player = { // generate player id ... it should be randomized in future
         //     "name": "player1",

@@ -1,7 +1,44 @@
-//package MMO.Backend.Classes
-//
-//import play.api.libs.json.Json
-//
+package MMO.Backend.Classes
+
+import play.api.libs.json.Json
+
+abstract class Continent {
+  var Name: String
+  var Money: Double = 5000.0
+  var Troops: Double = 1000.0
+  var Resources: Double = 2500.0
+
+  var MoneyGrowth: Double = 0.0
+  var TroopGrowth: Double = 0.0
+  var ResourceGrowth: Double = 0.0
+
+  var troopsDefending: Double = 0.0
+  var troopsAttacking: Double = 0.0
+
+  var pricePerAttack: Double = 1000.0
+  var resourcesPerAttack: Double = 2000.0
+
+  var pricePerDefense: Double = 5000
+  var resourcesPerDefense:Double = 1000
+
+  def resourcePerSecond(): Double
+
+  def toJson(): String = {
+    val money: String = Money.toString()
+    val troops: String = Troops.toString()
+    val resources: String = Resources.toString()
+    val moneyGrowth: String = MoneyGrowth.toString()
+    val troopGrowth: String = TroopGrowth.toString()
+    val resourceGrowth: String = ResourceGrowth.toString
+    val Arr: Array[String] = Array(Name, money, troops, resources, moneyGrowth, troopGrowth, resourceGrowth)
+    Json.stringify(Json.toJson(Arr))
+  }
+
+
+}
+
+
+
 //abstract class Continent(var Name: String, var Money: Int, var Troops: Int, var Resources: Int, var MoneyGrowth: Int, var TroopGrowth: Int, var ResourceGrowth: Int) {
 //
 //  var troopsDefending : Int = 0
@@ -55,7 +92,7 @@
 //      attacker.troopsAttacking = 0
 //    }
 //  }
-//  //puts all the properties in an array
+  //puts all the properties in an array
 //  def toJson(): String = {
 //    val money: String = Money.toString()
 //    val troops: String = Troops.toString() //returns any, at least for me
