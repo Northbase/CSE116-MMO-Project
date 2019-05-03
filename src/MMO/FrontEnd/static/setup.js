@@ -18,8 +18,10 @@ function registerUser(username) {
 // });
 
 socket.on('message', function(event) { // handle gold, money, military display here.
-    window.gameState = JSON.parse(event);
-    console.log(gameState);
+    window.gameState = event["gameState"];
+    window.lobby = event["lobby"];
+    // console.log(lobby[currentRoom][currentContinent]);
+    // console.log(Object.values(lobby));
 });
 
 
@@ -138,8 +140,8 @@ function setup() {
     joinButton.height = 90;
     joinButton.position.set(app.screen.width/2, app.screen.height/2  + 250);
     joinButton.on("click", () => {
-        if(rooms.includes(currentRoom.toString())) {
-            socket.emit("joinRoom", {"room": currentRoom, "continent": currentContinent}); // send "join" to the server
+        if(rooms.includes(currentRoom.toString()) && Object.keys(lobby[currentRoom]).length < 7) {// also need to check if room is occupied...
+            socket.emit("joinRoom", {"room": currentRoom.toString(), "continent": currentContinent}); // send "join" to the server
 
             state = continentSelect;
             for(var i = 0; i < continents.length; i++) {
@@ -177,9 +179,11 @@ function setup() {
     playButton.interactive = true;
     playButton.buttonMode = true;
     playButton.on("click", ()=> {
-        if(continents.includes(currentContinent)) {
+        console.log(Object.values(lobby[currentRoom]));
+        var occupiedContinents = Object.values(lobby[currentRoom])
+        if(continents.includes(currentContinent) && occupiedContinents.includes(currentContinent) == false) { // also need to check if current is occupied...
             state = play;
-            socket.emit("playGame", {"room": currentRoom, "continent": currentContinent});
+            socket.emit("playGame", {"room": currentRoom.toString(), "continent": currentContinent});
         }
     });
     CONTINENT_SELECT_component.addChild(playButton);

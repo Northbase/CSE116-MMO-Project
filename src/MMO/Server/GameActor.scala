@@ -14,6 +14,7 @@ class GameActor(username: String) extends Actor {
 
   override def receive: Receive = {
     case Setup =>
+//      game.continent = new
       // setup Database
     case Update =>
       game.update(System.nanoTime())

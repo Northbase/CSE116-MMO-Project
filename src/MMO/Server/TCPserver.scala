@@ -20,7 +20,7 @@ class TCPserver extends Actor {
 
   var clients: Set[ActorRef] = Set()
   var gameActors = mutable.Map[String, ActorRef]()
-  var lobby = mutable.Map[String, mutable.Map[String, String]]("0" -> mutable.Map[String, String](), "1" -> mutable.Map[String, String](), "2" -> mutable.Map[String, String](), "3" -> mutable.Map[String, String]())
+  var lobby = mutable.Map[String, mutable.Map[String, String]]("0" -> mutable.Map(), "1" -> mutable.Map(), "2" -> mutable.Map(), "3" -> mutable.Map())
 
   var buffer: String = ""
   val delimiter: String = "~"
@@ -46,18 +46,26 @@ class TCPserver extends Actor {
         gameActors += (username -> childActor)
         gameActors(username) ! Setup
       }else if(action == "disconnected") {
-        gameActors(username) ! PoisonPill
-        gameActors -= username
+        gameActors(username) ! PoisonPill // kill player's gameActor
+        gameActors -= username // remove player from gameActor map
+        lobby.foreach( r => { // remove player from lobby map
+          if(r._2.keySet.contains(username)) { lobby(r._1) -= username}
+        })
       }else if(action == "joinRoom") {
         val status: String = (JSONdata \ "status").as[String]
+        val room: String = (JSONdata \ "room").as[String]
         if(status == "pass") {
+          lobby(room)(username) = ""
         }
       }else if(action == "playGame") {
         val status: String = (JSONdata \ "status").as[String]
+        val room: String = (JSONdata \ "room").as[String]
+        val continent: String = (JSONdata \ "continent").as[String]
 //        println("clients: " + clients)
 //        println("players: " + username)
         if(status == "pass") {
-//          gameActors(username) !
+          lobby(room)(username) = continent
+//          gameActors(username) ! Setup()
         }
       }else if(action == "attack") {
         val target: String = (JSONdata \ "target").as[String]

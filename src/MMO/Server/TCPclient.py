@@ -39,11 +39,12 @@ Thread(target=listen_to_server, args=(s,)).start()
 
 
 def get_from_server(data):
-    message = json.loads(data)  # contains game state
-    username = message["username"]
+    gameState = json.loads(data)  # contains game state
+    package = {"gameState": gameState, "lobby": lobby}
+    username = gameState["username"]
     user_socket = usernameToSid.get(username, None)
     if user_socket:
-        socket_server.emit('message', data, room=user_socket)  # need to know more about room parameter...
+        socket_server.emit('message', package, room=user_socket)  # need to know more about room parameter...
 
 
 def send_to_server(data):
@@ -87,10 +88,10 @@ def join(data):
 @socket_server.on('playGame')
 def play(data):
     username = sidToUsername[request.sid]
-    occupiedContinent = lobby[str(data["room"])].values()
+    occupiedContinent = lobby[data["room"]].values()
     if data["continent"] not in occupiedContinent:
         message = {"username": username, "action": "playGame", "room": data["room"], "continent": data["continent"], "status": "pass"}
-        lobby[str(data["room"])].update({username: data["continent"]})
+        lobby[data["room"]].update({username: data["continent"]})
     else:
         message = {"username": username, "action": "playGame", "room": data["room"], "continent": data["continent"], "status": "fail"}
     send_to_server(message)
