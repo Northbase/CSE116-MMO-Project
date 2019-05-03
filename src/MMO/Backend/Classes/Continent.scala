@@ -4,6 +4,7 @@ import play.api.libs.json.{JsValue, Json}
 
 abstract class Continent {
   var Name: String
+  var continentName: String
   var Money: Double = 5000.0
   var Troops: Double = 1000.0
   var Resources: Double = 2500.0
@@ -67,6 +68,7 @@ abstract class Continent {
   def toJson(): JsValue = {
     val map: Map[String, JsValue] = Map(
       "username" -> Json.toJson(Name),
+      "continent" -> Json.toJson(continentName),
       "money" -> Json.toJson(Money),
       "troops" -> Json.toJson(Troops),
       "resources" -> Json.toJson(Resources),
@@ -74,6 +76,8 @@ abstract class Continent {
       "troopGrowth" -> Json.toJson(TroopGrowth),
       "resourceGrowth" -> Json.toJson(ResourceGrowth))
 
+//    val continentsMap: Map[String, JsValue] = Map(continentName -> Json.toJson(map))
+//    Json.toJson(Json.toJson(continentsMap))
     Json.toJson(map)
   }
 }

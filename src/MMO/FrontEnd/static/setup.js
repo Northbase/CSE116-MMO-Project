@@ -23,11 +23,6 @@ socket.on('message', function(event) { // handle gold, money, military display h
 });
 
 
-// $.get("test.json", function(data) {
-//     window.continentsInfoPackage = data;
-// });
-
-
 let app = new Application({
     width: 1280,
     height: 720,
@@ -43,9 +38,11 @@ loader
     .add("textures/GUI.png")
     .load(setup);
 
+let rooms = ["0", "1", "2", "3"];
 let continents = ["North America", "South America", "Africa", "Europe", "Asia", "Australia", "Antarctica"];
 let currentRoom = "";
 let currentContinent = "";
+let targetLocation;
 
 
 function setup() {
@@ -141,11 +138,13 @@ function setup() {
     joinButton.height = 90;
     joinButton.position.set(app.screen.width/2, app.screen.height/2  + 250);
     joinButton.on("click", () => {
-        socket.emit("joinRoom", {"room": currentRoom, "continent": currentContinent}); // send "join" to the server
+        if(rooms.includes(currentRoom.toString())) {
+            socket.emit("joinRoom", {"room": currentRoom, "continent": currentContinent}); // send "join" to the server
 
-        state = continentSelect;
-        for(var i = 0; i < continents.length; i++) {
-            selectContinent(currentRoom, i);
+            state = continentSelect;
+            for(var i = 0; i < continents.length; i++) {
+                selectContinent(currentRoom, i);
+            }
         }
     });
     ROOM_SELECT_component.addChild(joinButton);
@@ -178,12 +177,10 @@ function setup() {
     playButton.interactive = true;
     playButton.buttonMode = true;
     playButton.on("click", ()=> {
-        socket.emit("playGame", {"room": currentRoom, "continent": currentContinent}); // send "play" to the server
-
-        // window.player = { // generate player id ... it should be randomized in future
-        //     "name": "player1",
-        //     "continent": "Antarctica"
-        // };
+        if(continents.includes(currentContinent)) {
+            state = play;
+            socket.emit("playGame", {"room": currentRoom, "continent": currentContinent});
+        }
     });
     CONTINENT_SELECT_component.addChild(playButton);
 
@@ -252,19 +249,9 @@ function setup() {
     pressAttack.width = 60;
     pressAttack.height = 60;
     pressAttack.on("click", ()=> {
-        socket.emit("attack"); // send "attack" to the server
-        // var continentInfoJSON = continentsInfoPackage;
-        // var playerInfo = continentInfoJSON[player.continent];
-        // var targetInfoArr = event_broadcast.text.split("\n");
-        // var targetInfo = {"continent": targetInfoArr[0], "gold": targetInfoArr[1], "military": targetInfoArr[2], "agriculture": targetInfoArr[3]};
-        // if(targetInfo.continent != player.continent && (targetInfo.continent != "" || targetInfo.continent != "Uncalimed")) {// prevent attacking own continent and unclaimed continent
-        //     console.log("before",continentInfoJSON[player.continent].military);
-        //     continentInfoJSON[player.continent].gold = playerInfo.gold - targetInfo.gold;
-        //     continentInfoJSON[player.continent].military = playerInfo.military - targetInfo.military;
-        //     continentInfoJSON[player.continent].agriculture = playerInfo.agriculture - targetInfo.agriculture;
-        //     console.log("after", continentInfoJSON[player.continent].military);
-        //     // continentsInfoPackage = JSON.stringify(continentInfoJSON);
-        // }
+        if(continents.includes(targetLocation) && targetLocation != gameState.continent) {
+            socket.emit("attack", {"target": targetLocation, "allocated": 300.0});
+        }
     });
     GUI_component.addChild(pressAttack);
 
@@ -275,19 +262,7 @@ function setup() {
     pressDefend.width = 60;
     pressDefend.height = 60;
     pressDefend.on("click", ()=> {
-        socket.emit("defend"); // send "defend" to the server
-        // var continentInfoJSON = continentsInfoPackage;
-        // var playerInfo = continentInfoJSON[player.continent];
-        // var targetInfoArr = event_broadcast.text.split("\n");
-        // var targetInfo = {"continent": targetInfoArr[0], "gold": targetInfoArr[1], "military": targetInfoArr[2], "agriculture": targetInfoArr[3]};
-        // if(targetInfo.continent != player.continent && (targetInfo.continent != "" || targetInfo.continent != "Uncalimed")) { // prevent defending own continent and unclaimed continent
-        //     console.log("before",continentInfoJSON[player.continent].military);
-        //     continentInfoJSON[player.continent].gold = playerInfo.gold - targetInfo.gold;
-        //     continentInfoJSON[player.continent].military = playerInfo.military - targetInfo.military;
-        //     continentInfoJSON[player.continent].agriculture = playerInfo.agriculture - targetInfo.agriculture;
-        //     console.log("after", continentInfoJSON[player.continent].military);
-        //     // continentsInfoPackage = JSON.stringify(continentInfoJSON);
-        // }
+        socket.emit("defend", {"allocated": 300.0});
     });
     GUI_component.addChild(pressDefend);
 
@@ -301,7 +276,7 @@ function setup() {
     /************************************* TILEMAP ***************************************************************/
 
 
-    var mapTextureMatrix = [ //default mapTextureMatrix (39x80 matrix <suitable for 15px>) [texture, r]
+    var mapTextureMatrix = [ //default mapTextureMatrix (39x80 matrix <suitable for 15px>)
         [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,1,0,1,1,1,0,1,1,1,1,1,0,0,0,0,0,0,0,2,2,2,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,1,0,0,0,0],
         [0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,1,1,1,0,0,1,1,1,1,1,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,2,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0],
@@ -483,39 +458,35 @@ function setup() {
                 var continentNum = mapRegionMatrix[mouseXY[1]][mouseXY[0]];
             }
 
-            var regionInfo = {"location": {}};
-
-            // var continentInfoJSON = JSON.parse(continentsInfoPackage);
-            // var continentInfoJSON = continentsInfoPackage;
+            // window.targetLocation;
 
             switch(continentNum) {
                 case 0:
-                    regionInfo.location = continentInfoJSON.Unclaimed;
+                    targetLocation = "Unclaimed";
                     break;
                 case 1:
-                    regionInfo.location = continentInfoJSON.NorthAmerica;
+                    targetLocation = "NorthAmerica";
                     break;
                 case 2:
-                    regionInfo.location = continentInfoJSON.SouthAmerica;
+                    targetLocation = "SouthAmerica";
                     break;
                 case 3:
-                    regionInfo.location = continentInfoJSON.Africa;
+                    targetLocation = "Africa";
                     break;
                 case 4:
-                    regionInfo.location = continentInfoJSON.Europe;
+                    targetLocation = "Europe";
                     break;
                 case 5:
-                    regionInfo.location = continentInfoJSON.Asia;
+                    targetLocation = "Asia";
                     break;
                 case 6:
-                    regionInfo.location = continentInfoJSON.Australia;
+                    targetLocation = "Australia";
                     break;
                 case 7:
-                    regionInfo.location = continentInfoJSON.Antarctica;
+                    targetLocation = "Antarctica";
                     break;
             }
-            // event_broadcast.text = JSON.stringify(regionInfo.location);
-            event_broadcast.text = [regionInfo.location.region, regionInfo.location.gold, regionInfo.location.military, regionInfo.location.agriculture].join().split(",").join("\n");
+            event_broadcast.text = targetLocation;
         });
     }
     userInteraction();
@@ -524,20 +495,12 @@ function setup() {
 
     window.state = mainMenu;
 
-    // setInterval(function() { // receive game state for 1 ms interval
-    //     $.get("test.json", function(data) {
-    //         console.log(data);
-            // continentsInfoPackage = data;
-        // });
-    // }, 1000);
-
     app.stage.addChild(TILEMAP_component);
     app.stage.addChild(GUI_component);
     app.stage.addChild(MAIN_MENU_component);
     app.stage.addChild(ROOM_SELECT_component);
     app.stage.addChild(CONTINENT_SELECT_component);
 
-    // app.renderer.render(app.stage);
     app.ticker.add(delta => gameLoop(delta, state));
 }
 
@@ -579,21 +542,16 @@ function play(delta, state) {
     app.stage.children[3].visible = false; // prevent ROOM_SELECT from rendering
     app.stage.children[4].visible = false; // prevent CONTINENT_SELECT from rendering
 
-    updateStats(player);
+    updateStats();
     updateTileSelection(state);
 }
 
 
 /******************************* Game Loop Methods **********************************************************************/
-function updateStats(player) {
-    var playerContinent = player.continent;
-
-    // var continentInfoJSON = JSON.parse(continentsInfoPackage);
-    var continentInfoJSON = continentsInfoPackage;
-
-    gold_magnitude.text = continentInfoJSON[playerContinent].gold;
-    military_magnitude.text = continentInfoJSON[playerContinent].military;
-    agriculture_magnitude.text = continentInfoJSON[playerContinent].agriculture;
+function updateStats() {
+    gold_magnitude.text = gameState["money"];
+    military_magnitude.text = gameState["troops"];
+    agriculture_magnitude.text = gameState["resources"];
 }
 
 function updateTileSelection(state) {

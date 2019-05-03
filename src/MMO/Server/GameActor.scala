@@ -10,11 +10,8 @@ case class Attack(targetContinent: String, troopsAllocated: Double)
 case class Defend(troopsAllocated: Double)
 
 class GameActor(username: String) extends Actor {
-  // Game class is setup by the username
-  // continents are pulled from database...
-  // continents are distributed to players in chronological order ...
-
   var game: Game = new Game(username)
+
   override def receive: Receive = {
     case Setup =>
       // setup Database

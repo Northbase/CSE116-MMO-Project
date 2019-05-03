@@ -39,13 +39,11 @@ Thread(target=listen_to_server, args=(s,)).start()
 
 
 def get_from_server(data):
-    message = json.loads(data) # contains game state
+    message = json.loads(data)  # contains game state
     username = message["username"]
     user_socket = usernameToSid.get(username, None)
-
-    # print("message is", message)
     if user_socket:
-        socket_server.emit('message', data, room=user_socket) # need to know more about room parameter...
+        socket_server.emit('message', data, room=user_socket)  # need to know more about room parameter...
 
 
 def send_to_server(data):
@@ -79,11 +77,10 @@ def disconnect():
 def join(data):
     username = sidToUsername[request.sid]
     if len(lobby[str(data["room"])]) < 7:
-        message = {"username": username, "action": "joinRoom", "status": "pass"}
+        message = {"username": username, "action": "joinRoom", "room": data["room"], "status": "pass"}
         lobby[str(data["room"])].update({username: data["continent"]})
-        # print(lobby)
     else:
-        message = {"username": username, "action": "joinRoom", "status": "fail"}
+        message = {"username": username, "action": "joinRoom", "room": data["room"], "status": "fail"}
     send_to_server(message)
 
 
@@ -92,25 +89,25 @@ def play(data):
     username = sidToUsername[request.sid]
     occupiedContinent = lobby[str(data["room"])].values()
     if data["continent"] not in occupiedContinent:
-        message = {"username": username, "action": "playGame", "status": "pass"}
+        message = {"username": username, "action": "playGame", "room": data["room"], "continent": data["continent"], "status": "pass"}
         lobby[str(data["room"])].update({username: data["continent"]})
-        # print(lobby)
     else:
-        message = {"username": username, "action": "playGame", "status": "fail"}
+        message = {"username": username, "action": "playGame", "room": data["room"], "continent": data["continent"], "status": "fail"}
     send_to_server(message)
 
 
 @socket_server.on('attack')
-def play():
+def attack(data):
     username = sidToUsername[request.sid]
-    message = {"username": username, "action": "attack"}
+    message = {"username": username, "action": "attack", "target": data["target"], "allocated": data["allocated"]}
     send_to_server(message)
 
 
+
 @socket_server.on('defend')
-def play():
+def defend(data):
     username = sidToUsername[request.sid]
-    message = {"username": username, "action": "defend"}
+    message = {"username": username, "action": "defend", "allocated": data["allocated"]}
     send_to_server(message)
 
 

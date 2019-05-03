@@ -7,6 +7,7 @@ import akka.actor.{Actor, ActorRef, ActorSystem, PoisonPill, Props}
 import akka.io.{IO, Tcp}
 import akka.util.ByteString
 import play.api.libs.json.{JsValue, Json}
+import scala.collection.mutable
 
 case class GameState(gameState: String)
 case object UpdateGames
@@ -18,7 +19,9 @@ class TCPserver extends Actor {
   IO(Tcp) ! Bind(self, new InetSocketAddress("localhost", 8000))
 
   var clients: Set[ActorRef] = Set()
-  var gameActors = scala.collection.mutable.Map[String, ActorRef]()
+  var gameActors = mutable.Map[String, ActorRef]()
+  var lobby = mutable.Map[String, mutable.Map[String, String]]("0" -> mutable.Map[String, String](), "1" -> mutable.Map[String, String](), "2" -> mutable.Map[String, String](), "3" -> mutable.Map[String, String]())
+
   var buffer: String = ""
   val delimiter: String = "~"
 
@@ -48,18 +51,18 @@ class TCPserver extends Actor {
       }else if(action == "joinRoom") {
         val status: String = (JSONdata \ "status").as[String]
         if(status == "pass") {
-
         }
-
       }else if(action == "playGame") {
         val status: String = (JSONdata \ "status").as[String]
+//        println("clients: " + clients)
+//        println("players: " + username)
         if(status == "pass") {
 //          gameActors(username) !
         }
-//        println("clients: " + clients)
-//        println("players: " + username)
       }else if(action == "attack") {
-        gameActors(username) ! Attack
+        val target: String = (JSONdata \ "target").as[String]
+        val allocated: Double = (JSONdata \ "allocated").as[Double]
+        gameActors(username) ! Attack(target, allocated)
       }else if(action == "defend") {
         gameActors(username) ! Defend
       }
