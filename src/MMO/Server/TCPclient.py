@@ -39,9 +39,13 @@ Thread(target=listen_to_server, args=(s,)).start()
 
 
 def get_from_server(data):
-    print("got: ", data)
-    # message = json.loads(data)
-    # socket_server.emit("test", data, broadcast=True)
+    message = json.loads(data) # contains game state
+    username = message["username"]
+    user_socket = usernameToSid.get(username, None)
+
+    # print("message is", message)
+    if user_socket:
+        socket_server.emit('message', data, room=user_socket) # need to know more about room parameter...
 
 
 def send_to_server(data):
@@ -77,7 +81,7 @@ def join(data):
     if len(lobby[str(data["room"])]) < 7:
         message = {"username": username, "action": "joinRoom", "status": "pass"}
         lobby[str(data["room"])].update({username: data["continent"]})
-        print(lobby)
+        # print(lobby)
     else:
         message = {"username": username, "action": "joinRoom", "status": "fail"}
     send_to_server(message)
@@ -90,7 +94,7 @@ def play(data):
     if data["continent"] not in occupiedContinent:
         message = {"username": username, "action": "playGame", "status": "pass"}
         lobby[str(data["room"])].update({username: data["continent"]})
-        print(lobby)
+        # print(lobby)
     else:
         message = {"username": username, "action": "playGame", "status": "fail"}
     send_to_server(message)
@@ -126,7 +130,6 @@ def game():
         username = request.form.get('username')
     else:
         username = "guest" + str(randint(0, 100000))
-    # return send_from_directory('../FrontEnd/templates', 'game.html', username=username)
     return render_template('game.html', username=username)
 
 

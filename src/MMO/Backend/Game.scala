@@ -3,29 +3,30 @@ package MMO.Backend
 import MMO.Backend.Classes._
 import play.api.libs.json.{JsValue, Json}
 
-class Game(username: String, continentName: String) {
+class Game(username: String) {
   var continent: Continent = new NorthAmerica(username)
-  var money: Double = 5000.0
-  var troops: Double = 300.0
-  var resources: Double = 2500.0
+  var money: Double = continent.Money
+  var troops: Double = continent.Troops
+  var resources: Double = continent.Resources
   var lastUpdateTime: Long = System.nanoTime()
-  var gameState: Map[String, JsValue] = Map()
+//  var gameState: Map[String, Continent] = Map("NorthAmerica" -> , "SouthAmerica" -> , "Africa" -> , "Europe" -> , "Asia" -> , "Australia" -> , "Antarctica" -> )
 
-  def invade(targetContinentName: String): Unit = {
-  }
-
-  def setupDefense(): Unit = {
-  }
 
   def toJson(): String = {
-    ""
+    Json.stringify(continent.toJson())
+  }
+
+  def attack(target: String , troopsAllocated: Double): Unit = { // need to convert target string into Continet class...
+//    continent.invade(target, troopsAllocated)
+  }
+
+  def defend(troopsAllocated: Double): Unit = {
+    continent.setupDefense(troopsAllocated)
   }
 
   def update(time: Long): Unit = {
     val dt = (time - this.lastUpdateTime) / 1000000000.0
-//    money += dt
-//    troops += dt
-//    resources += dt
+    continent.update()
 
     this.lastUpdateTime = time
   }

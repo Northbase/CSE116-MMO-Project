@@ -9,6 +9,7 @@ import akka.util.ByteString
 import play.api.libs.json.{JsValue, Json}
 
 case class GameState(gameState: String)
+case object UpdateGames
 
 class TCPserver extends Actor {
   import Tcp._
@@ -62,9 +63,10 @@ class TCPserver extends Actor {
       }else if(action == "defend") {
         gameActors(username) ! Defend
       }
-
     case gs: GameState =>
       this.clients.foreach((client: ActorRef) => client ! Write(ByteString(gs.gameState + "~")))
+    case UpdateGames =>
+      this.gameActors.foreach( kv => kv._2 ! Update )
   }
 
 }
@@ -80,7 +82,7 @@ object TCPserver {
 
     val server = actorSystem.actorOf(Props(classOf[TCPserver]))
 
-//    actorSystem.scheduler.schedule(0 milliseconds, 100 milliseconds, server, test)
+    actorSystem.scheduler.schedule(0 milliseconds, 1000 milliseconds, server, UpdateGames)
   }
 
 }

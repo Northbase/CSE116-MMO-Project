@@ -17,13 +17,15 @@ function registerUser(username) {
 // socket.on('connect', function(event) {
 // });
 
-// socket.on('message', function(event) {
-// });
-
-
-$.get("test.json", function(data) {
-    window.continentsInfoPackage = data;
+socket.on('message', function(event) { // handle gold, money, military display here.
+    window.gameState = JSON.parse(event);
+    console.log(gameState);
 });
+
+
+// $.get("test.json", function(data) {
+//     window.continentsInfoPackage = data;
+// });
 
 
 let app = new Application({
@@ -250,7 +252,6 @@ function setup() {
     pressAttack.width = 60;
     pressAttack.height = 60;
     pressAttack.on("click", ()=> {
-        // var continentInfoJSON = JSON.parse(continentsInfoPackage);
         socket.emit("attack"); // send "attack" to the server
         // var continentInfoJSON = continentsInfoPackage;
         // var playerInfo = continentInfoJSON[player.continent];
@@ -274,7 +275,6 @@ function setup() {
     pressDefend.width = 60;
     pressDefend.height = 60;
     pressDefend.on("click", ()=> {
-        // var continentInfoJSON = JSON.parse(continentsInfoPackage);
         socket.emit("defend"); // send "defend" to the server
         // var continentInfoJSON = continentsInfoPackage;
         // var playerInfo = continentInfoJSON[player.continent];
@@ -486,7 +486,7 @@ function setup() {
             var regionInfo = {"location": {}};
 
             // var continentInfoJSON = JSON.parse(continentsInfoPackage);
-            var continentInfoJSON = continentsInfoPackage;
+            // var continentInfoJSON = continentsInfoPackage;
 
             switch(continentNum) {
                 case 0:
@@ -524,12 +524,12 @@ function setup() {
 
     window.state = mainMenu;
 
-    setInterval(function() { // receive game state for 1 ms interval
-        $.get("test.json", function(data) {
-            // console.log(data);
-            continentsInfoPackage = data;
-        });
-    }, 1000);
+    // setInterval(function() { // receive game state for 1 ms interval
+    //     $.get("test.json", function(data) {
+    //         console.log(data);
+            // continentsInfoPackage = data;
+        // });
+    // }, 1000);
 
     app.stage.addChild(TILEMAP_component);
     app.stage.addChild(GUI_component);
