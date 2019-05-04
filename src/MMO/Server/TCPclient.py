@@ -40,7 +40,9 @@ Thread(target=listen_to_server, args=(s,)).start()
 
 def get_from_server(data):
     gameState = json.loads(data)  # contains game state
-    package = {"gameState": gameState, "lobby": lobby}
+    # needs to keep each players game state in server...
+    
+    package = {"gameState": gameState, "lobbyState": lobby}
     username = gameState["username"]
     user_socket = usernameToSid.get(username, None)
     if user_socket:

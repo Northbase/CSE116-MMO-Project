@@ -17,9 +17,9 @@ function registerUser(username) {
 // socket.on('connect', function(event) {
 // });
 
-socket.on('message', function(event) { // unload gameState and lobby status
+socket.on('message', function(event) { // unload gameState and lobbyState status
     window.gameState = event["gameState"];
-    window.lobby = event["lobby"];
+    window.lobbyState = event["lobbyState"];
 });
 
 
@@ -138,7 +138,7 @@ function setup() {
     joinButton.height = 90;
     joinButton.position.set(app.screen.width/2, app.screen.height/2  + 250);
     joinButton.on("click", () => {
-        if(rooms.includes(currentRoom.toString()) && Object.keys(lobby[currentRoom]).length < 7) {// also need to check if room is occupied...
+        if(rooms.includes(currentRoom.toString()) && Object.keys(lobbyState[currentRoom]).length < 7) {// also need to check if room is occupied...
             socket.emit("joinRoom", {"room": currentRoom.toString(), "continent": currentContinent}); // send "join" to the server
 
             state = continentSelect;
@@ -179,8 +179,8 @@ function setup() {
     playButton.interactive = true;
     playButton.buttonMode = true;
     playButton.on("click", ()=> {
-        console.log(Object.values(lobby[currentRoom]));
-        var occupiedContinents = Object.values(lobby[currentRoom]);
+        console.log(Object.values(lobbyState[currentRoom]));
+        var occupiedContinents = Object.values(lobbyState[currentRoom]);
         if(continents.includes(currentContinent) && occupiedContinents.includes(currentContinent) == false) { // also need to check if current is occupied...
             state = play;
             socket.emit("playGame", {"room": currentRoom.toString(), "continent": currentContinent});
@@ -448,7 +448,7 @@ function setup() {
                     zoomLevel-=1;
                     break;
                 case 'Tab':
-                    alert(JSON.stringify(lobby[currentRoom]))
+                    alert(JSON.stringify(lobbyState[currentRoom]))
             }
             if(dx >= dxLimit) { dx = dxLimit; }
             if(dx < 0 ) { dx = 0; }

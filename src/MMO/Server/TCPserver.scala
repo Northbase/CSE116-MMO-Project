@@ -60,8 +60,6 @@ class TCPserver extends Actor {
         val status: String = (JSONdata \ "status").as[String]
         val room: String = (JSONdata \ "room").as[String]
         val continent: String = (JSONdata \ "continent").as[String]
-//        println("clients: " + clients)
-//        println("players: " + username)
         if(status == "pass") {
           lobby(room)(username) = continent
           gameActors(username) ! Setup(continent)
@@ -69,9 +67,12 @@ class TCPserver extends Actor {
       }else if(action == "attack") {
         val target: String = (JSONdata \ "target").as[String]
         val allocated: Double = (JSONdata \ "allocated").as[Double]
+
         gameActors(username) ! Attack(target, allocated)
       }else if(action == "defend") {
-        gameActors(username) ! Defend
+        val allocated: Double = (JSONdata \ "allocated").as[Double]
+
+        gameActors(username) ! Defend(allocated)
       }
     case gs: GameState =>
       this.clients.foreach((client: ActorRef) => client ! Write(ByteString(gs.gameState + "~")))
@@ -92,7 +93,7 @@ object TCPserver {
 
     val server = actorSystem.actorOf(Props(classOf[TCPserver]))
 
-    actorSystem.scheduler.schedule(0 milliseconds, 1000 milliseconds, server, UpdateGames)
+    actorSystem.scheduler.schedule(0 milliseconds, 100 milliseconds, server, UpdateGames)
   }
 
 }
