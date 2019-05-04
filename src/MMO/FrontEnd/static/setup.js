@@ -17,11 +17,9 @@ function registerUser(username) {
 // socket.on('connect', function(event) {
 // });
 
-socket.on('message', function(event) { // handle gold, money, military display here.
+socket.on('message', function(event) { // unload gameState and lobby status
     window.gameState = event["gameState"];
     window.lobby = event["lobby"];
-    // console.log(lobby[currentRoom][currentContinent]);
-    // console.log(Object.values(lobby));
 });
 
 
@@ -41,7 +39,7 @@ loader
     .load(setup);
 
 let rooms = ["0", "1", "2", "3"];
-let continents = ["North America", "South America", "Africa", "Europe", "Asia", "Australia", "Antarctica"];
+let continents = ["NorthAmerica", "SouthAmerica", "Africa", "Europe", "Asia", "Australia", "Antarctica"];
 let currentRoom = "";
 let currentContinent = "";
 let targetLocation;
@@ -147,6 +145,8 @@ function setup() {
             for(var i = 0; i < continents.length; i++) {
                 selectContinent(currentRoom, i);
             }
+        }else {
+            alert("Room is full!");
         }
     });
     ROOM_SELECT_component.addChild(joinButton);
@@ -180,10 +180,12 @@ function setup() {
     playButton.buttonMode = true;
     playButton.on("click", ()=> {
         console.log(Object.values(lobby[currentRoom]));
-        var occupiedContinents = Object.values(lobby[currentRoom])
+        var occupiedContinents = Object.values(lobby[currentRoom]);
         if(continents.includes(currentContinent) && occupiedContinents.includes(currentContinent) == false) { // also need to check if current is occupied...
             state = play;
             socket.emit("playGame", {"room": currentRoom.toString(), "continent": currentContinent});
+        }else {
+            alert("Continent already in use!");
         }
     });
     CONTINENT_SELECT_component.addChild(playButton);
@@ -445,6 +447,8 @@ function setup() {
                     (TILEMAP_component.children).length = 0;
                     zoomLevel-=1;
                     break;
+                case 'Tab':
+                    alert(JSON.stringify(lobby[currentRoom]))
             }
             if(dx >= dxLimit) { dx = dxLimit; }
             if(dx < 0 ) { dx = 0; }

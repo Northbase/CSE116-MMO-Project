@@ -44,7 +44,6 @@ class TCPserver extends Actor {
 
       if(action == "registered") {
         gameActors += (username -> childActor)
-        gameActors(username) ! Setup
       }else if(action == "disconnected") {
         gameActors(username) ! PoisonPill // kill player's gameActor
         gameActors -= username // remove player from gameActor map
@@ -65,7 +64,7 @@ class TCPserver extends Actor {
 //        println("players: " + username)
         if(status == "pass") {
           lobby(room)(username) = continent
-//          gameActors(username) ! Setup()
+          gameActors(username) ! Setup(continent)
         }
       }else if(action == "attack") {
         val target: String = (JSONdata \ "target").as[String]

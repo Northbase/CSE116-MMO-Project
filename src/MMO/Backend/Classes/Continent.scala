@@ -75,9 +75,6 @@ abstract class Continent {
       "moneyGrowth" -> Json.toJson(MoneyGrowth),
       "troopGrowth" -> Json.toJson(TroopGrowth),
       "resourceGrowth" -> Json.toJson(ResourceGrowth))
-
-//    val continentsMap: Map[String, JsValue] = Map(continentName -> Json.toJson(map))
-//    Json.toJson(Json.toJson(continentsMap))
     Json.toJson(map)
   }
 }

@@ -104,7 +104,6 @@ def attack(data):
     send_to_server(message)
 
 
-
 @socket_server.on('defend')
 def defend(data):
     username = sidToUsername[request.sid]
