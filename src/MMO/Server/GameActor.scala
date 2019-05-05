@@ -1,16 +1,17 @@
 package MMO.Server
 
+import play.api.libs.json._
 import akka.actor.Props
 import MMO.Backend.Game
 import akka.actor._
 
 case object Update
 case class Setup(continentName: String)
-case class Attack(targetContinent: String, troopsAllocated: Double)
-case class Defend(troopsAllocated: Double)
+case class Attack(targetContinent: String, targetID: String, troopsAllocated: Double, currentRoomGameState: JsValue)
+case class Defend(troopsAllocated: Double, currentRoomGameState: JsValue)
 
 class GameActor(username: String) extends Actor {
-  var game: Game = new Game(username, "NorthAmerica") // placeholder
+  var game: Game = new Game("_____", "Unclaimed") // placeholder
 
   override def receive: Receive = {
     case setup: Setup =>
@@ -19,9 +20,17 @@ class GameActor(username: String) extends Actor {
     case Update =>
       game.update(System.nanoTime())
       sender() ! GameState(game.toJson())
-    case attack: Attack =>
-      game.attack(attack.targetContinent, attack.troopsAllocated)
+    case attack: Attack => // parse by usernames...
+//      println(attack.currentRoomGameState.getClass)
+//      val test = (attack.currentRoomGameState \ username)
+//      println(test)
+//      println("MONEY",  test \ "resources")
+      game.attack(attack.targetContinent, attack.targetID, attack.troopsAllocated, attack.currentRoomGameState)
+      sender() ! GameState(game.toJson())
+
     case defend: Defend =>
-      game.defend(defend.troopsAllocated)
+      game.defend(defend.troopsAllocated, defend.currentRoomGameState)
+      sender() ! GameState(game.toJson())
+
   }
 }

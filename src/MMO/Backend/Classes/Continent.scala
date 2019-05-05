@@ -33,6 +33,7 @@ abstract class Continent {
 //      battle(this, target)
 //      troopsAttacking = 0
 //    }
+    battle(this, target)
     this.Troops -= 150.0
     target.Money -= 300.0
   }
@@ -47,20 +48,21 @@ abstract class Continent {
   }
 
   def battle(attacker: Continent, defender: Continent): Unit = {
-    if(attacker.troopsAttacking > defender.troopsDefending) { // attack was successful
-      var spoils = defender.Money * .20
-      attacker.Money += spoils
-      defender.Money -= spoils
-
-      attacker.Troops += attacker.troopsAttacking
-      defender.troopsDefending = 0
-    } else { // attack wasn't successful
-      var spoils = attacker.Money * .35
-      attacker.Money -= spoils
-      defender.Money += spoils
-
-      attacker.troopsAttacking = 0
-    }
+//    if(attacker.troopsAttacking > defender.troopsDefending) { // attack was successful
+//      var spoils = defender.Money * .20
+//      attacker.Money += spoils
+//      defender.Money -= spoils
+//
+//      attacker.Troops += attacker.troopsAttacking
+//      defender.troopsDefending = 0
+//    } else { // attack wasn't successful
+//      var spoils = attacker.Money * .35
+//      attacker.Money -= spoils
+//      defender.Money += spoils
+//
+//      attacker.troopsAttacking = 0
+//    }
+    defender.Money -= 300.0
   }
 
   def update() ={

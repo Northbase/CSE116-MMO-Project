@@ -2,11 +2,10 @@ package MMO.Server
 
 import java.net.InetSocketAddress
 
-import play.api.libs.json
 import akka.actor.{Actor, ActorRef, ActorSystem, PoisonPill, Props}
 import akka.io.{IO, Tcp}
 import akka.util.ByteString
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json._
 import scala.collection.mutable
 
 case class GameState(gameState: String)
@@ -66,13 +65,16 @@ class TCPserver extends Actor {
         }
       }else if(action == "attack") {
         val target: String = (JSONdata \ "target").as[String]
+        val targetID: String = (JSONdata \ "targetID").as[String]
         val allocated: Double = (JSONdata \ "allocated").as[Double]
+        val fullGameState: JsValue = (JSONdata \ "currentRoomGameState").as[JsValue]
 
-        gameActors(username) ! Attack(target, allocated)
+        gameActors(username) ! Attack(target, targetID, allocated, fullGameState)
       }else if(action == "defend") {
         val allocated: Double = (JSONdata \ "allocated").as[Double]
+        val fullGameState: JsValue = (JSONdata \ "currentRoomGameState").as[JsValue]
 
-        gameActors(username) ! Defend(allocated)
+        gameActors(username) ! Defend(allocated, fullGameState)
       }
     case gs: GameState =>
       this.clients.foreach((client: ActorRef) => client ! Write(ByteString(gs.gameState + "~")))
