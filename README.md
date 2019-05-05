@@ -2,14 +2,15 @@
 
 <pre>
 <b>To Start the App:</b>
-type npm start in command.
+> type npm start in cmd
 
-<b>For Flask Server </b>
-HTML files should be in "templates" directory
-CSS files should be in "static/styles" directory
+<b>To Start Web App:</b>
+> run TCPserver.scala
+> run TCPclient.py
 
 <b>Controls:</b>
 W A S D: Camera Movement 
 Q: Camera Zoom In
 E: Camera Zoom Out
+TAB: Room Status
 </pre>
