@@ -9,9 +9,9 @@ abstract class Continent {
   var Troops: Double = 10000.0
   var Resources: Double = 10000.0
 
-  var MoneyGrowth: Double = 50.0
-  var TroopGrowth: Double = 50.0
-  var ResourceGrowth: Double = 50.0
+  var MoneyGrowth: Double = 15.0
+  var TroopGrowth: Double = 15.0
+  var ResourceGrowth: Double = 15.0
 
   var troopsDefending: Double = 0
   var troopsAttacking: Double = 0
@@ -23,52 +23,36 @@ abstract class Continent {
   var resourcesPerDefense:Double = 1000
 
   def invade(target: Continent, troopsAllocated : Double) = {
-//    if(Money >= pricePerAttack && Resources >= resourcesPerAttack && Troops >= troopsAllocated) { // handles if user has enough troop, resource, troops to attack
-//
-//      this.Money -= pricePerAttack
-//      this.Resources -= resourcesPerAttack
-//      this.Troops -= troopsAllocated
-//      troopsAttacking += troopsAllocated
-//
-//      battle(this, target)
-//      troopsAttacking = 0
-//    }
-    battle(this, target)
-    this.Troops -= 150.0
-    target.Money -= 300.0
   }
 
-  def setupDefense(troopsAllocated : Double) = {
-//    Money = 55555.0
-
+  def setupAttack(troopsAllocated: Double) = {
     if(Money >= pricePerDefense && Resources >= resourcesPerDefense && Troops >= troopsAllocated) { // handles if user has enough troop, resource, troops to defend
       Troops -= troopsAllocated
+      Resources -= 250
+      Money -= 250
+      troopsDefending += troopsAllocated
+    }
+  }
+
+
+  def setupDefense(troopsAllocated : Double) = {
+    if(Money >= pricePerDefense && Resources >= resourcesPerDefense && Troops >= troopsAllocated) { // handles if user has enough troop, resource, troops to defend
+      Troops -= troopsAllocated
+      Resources -= 500
+      Money -= 500
       troopsDefending += troopsAllocated
     }
   }
 
   def battle(attacker: Continent, defender: Continent): Unit = {
-//    if(attacker.troopsAttacking > defender.troopsDefending) { // attack was successful
-//      var spoils = defender.Money * .20
-//      attacker.Money += spoils
-//      defender.Money -= spoils
-//
-//      attacker.Troops += attacker.troopsAttacking
-//      defender.troopsDefending = 0
-//    } else { // attack wasn't successful
-//      var spoils = attacker.Money * .35
-//      attacker.Money -= spoils
-//      defender.Money += spoils
-//
-//      attacker.troopsAttacking = 0
-//    }
-    defender.Money -= 300.0
+    attacker.Troops -= 300
+    defender.Money -= 1000
   }
 
   def update() ={
-//    Money += MoneyGrowth
-//    Troops += TroopGrowth
-//    Resources += ResourceGrowth
+//      Money += MoneyGrowth
+//      Troops += TroopGrowth
+//      Resources += ResourceGrowth
   }
 
   def toJson(): JsValue = {
@@ -141,7 +125,7 @@ abstract class Continent {
 //    }
 //  }
 
-  //puts all the properties in an array
+//puts all the properties in an array
 //  def toJson(): String = {
 //    val money: String = Money.toString()
 //    val troops: String = Troops.toString() //returns any, at least for me

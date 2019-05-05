@@ -1,6 +1,5 @@
 import json
 import socket
-import time
 from threading import Thread
 from random import randint
 
@@ -16,10 +15,10 @@ socket_server = SocketIO(app)
 
 usernameToSid = {}
 sidToUsername = {}
-clientUserName = {}
-usernameToContinent = {}
+
+usernameToGame = {}
+
 lobby = {"0": {}, "1": {}, "2": {}, "3": {}}
-# targetID = {} # placeholder
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect(('localhost', 8000))
@@ -39,34 +38,15 @@ def listen_to_server(the_socket):
 Thread(target=listen_to_server, args=(s,)).start()
 
 
-# maybe go back to original method... this is really bugy
 def get_from_server(data):
-    # gameState = loaded["Unclaimed"]  # contains game state
-    username = clientUserName.get("username", None)
-    loaded = json.loads(data)
+    gameState = json.loads(data)  # contains game state
+    # needs to keep each players game state in server...
 
-    if username:
-        # print(loaded)
-        user_socket = usernameToSid.get(username, None)
-        if user_socket:
-            # print(loaded)
-            continent = usernameToContinent.get(username, "Unclaimed")
-            gameState = loaded.get(continent, loaded["Unclaimed"])  # contains game state
-            # gameState = loaded[username]
-        # print(loaded.keys(), usernameToContinent[username] in loaded.keys())
-        # print(username in loaded.keys())
-        # print("LOADed: ", loaded)
-        # print("GS: ", gameState)
-        # if gameState["continent"] != "Unclaimed":
-        for room, player in lobby.items():
-            if username in player.keys():
-                lobby[room].update({username: gameState})
-        package = {"username": username, "gameState": lobby}
-        # print(package)
-
-        user_socket = usernameToSid.get(username, None)
-        if user_socket:
-            socket_server.emit('message', package)  # need to know more about room parameter...
+    package = {"gameState": gameState, "lobbyState": lobby}
+    username = gameState["username"]
+    user_socket = usernameToSid.get(username, None)
+    if user_socket:
+        socket_server.emit('message', package, room=user_socket)  # need to know more about room parameter...
 
 
 def send_to_server(data):
@@ -76,7 +56,6 @@ def send_to_server(data):
 @socket_server.on('register')
 def register(username):
     print(username + " registered")
-    clientUserName["username"] = username
     usernameToSid[username] = request.sid
     sidToUsername[request.sid] = username
     message = {"username": username, "action": "registered"}
@@ -113,7 +92,6 @@ def play(data):
     username = sidToUsername[request.sid]
     occupiedContinent = lobby[data["room"]].values()
     if data["continent"] not in occupiedContinent:
-        usernameToContinent[username] = data["continent"]
         message = {"username": username, "action": "playGame", "room": data["room"], "continent": data["continent"], "status": "pass"}
         lobby[data["room"]].update({username: data["continent"]})
     else:
@@ -124,23 +102,14 @@ def play(data):
 @socket_server.on('attack')
 def attack(data):
     username = sidToUsername[request.sid]
-
-    for room, player in lobby.items():  # check if the same room, get targetID
-        if username in player.keys():
-            for p in lobby[room]:
-                if lobby[room][p]["continent"] == data["target"]:
-                    targetID["targetID"] = lobby[room][p]["username"]
-                    print("attacking: ", room, data["target"], targetID)
-
-    # id = targetID.get("targetID", "_____")
-    message = {"username": username, "action": "attack", "target": data["target"], "targetID": targetID, "allocated": data["allocated"], "currentRoomGameState": data["currentRoomGameState"]}
+    message = {"username": username, "action": "attack", "target": data["target"], "allocated": data["allocated"]}
     send_to_server(message)
 
 
 @socket_server.on('defend')
 def defend(data):
     username = sidToUsername[request.sid]
-    message = {"username": username, "action": "defend", "allocated": data["allocated"], "currentRoomGameState": data["currentRoomGameState"]}
+    message = {"username": username, "action": "defend", "allocated": data["allocated"]}
     send_to_server(message)
 
 
@@ -165,4 +134,3 @@ def game():
 
 if __name__ == "__main__":
     socket_server.run(app, port=8080, debug="true")
-

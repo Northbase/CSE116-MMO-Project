@@ -17,10 +17,9 @@ function registerUser(username) {
 // socket.on('connect', function(event) {
 // });
 
-socket.on('message', function(event) { // unload gameState for each players from each room
+socket.on('message', function(event) { // unload gameState and lobbyState status
     window.gameState = event["gameState"];
-    window.username = event["username"];
-    console.log(gameState);
+    window.lobbyState = event["lobbyState"];
 });
 
 
@@ -125,7 +124,7 @@ function setup() {
 
             ROOM_SELECT_component.children.forEach( c => { c.tint = "0xe1e6ed"; });
             room.tint = "0xc4b5a6";
-            console.log(currentRoom);
+            console.log("ROOM: " + currentRoom);
         });
         ROOM_SELECT_component.addChild(room);
     }
@@ -139,7 +138,7 @@ function setup() {
     joinButton.height = 90;
     joinButton.position.set(app.screen.width/2, app.screen.height/2  + 250);
     joinButton.on("click", () => {
-        if(rooms.includes(currentRoom.toString()) && Object.keys(gameState[currentRoom]).length < 7) {// check if room is occupied...
+        if(rooms.includes(currentRoom.toString()) && Object.keys(lobbyState[currentRoom]).length < 7) {// also need to check if room is occupied...
             socket.emit("joinRoom", {"room": currentRoom.toString(), "continent": currentContinent}); // send "join" to the server
 
             state = continentSelect;
@@ -166,7 +165,7 @@ function setup() {
 
             CONTINENT_SELECT_component.children.forEach( c => { c.tint = "0xe1e6ed"; });
             continentGrid.tint = "0xc4b5a6";
-            console.log(roomNumber, currentContinent);
+            console.log("ROOM: " + roomNumber +" CONTINENT: " +currentContinent);
         });
         CONTINENT_SELECT_component.addChild(continentGrid);
     }
@@ -180,14 +179,10 @@ function setup() {
     playButton.interactive = true;
     playButton.buttonMode = true;
     playButton.on("click", ()=> {
-        let occupiedContinents = [];
-        Object.values(gameState[currentRoom]).forEach( function(player) { // occupation check function
-            occupiedContinents.push(player["continent"]);
-        });
-        if(continents.includes(currentContinent) && occupiedContinents.includes(currentContinent) == false) { // check if continent is occupied...
+        var occupiedContinents = Object.values(lobbyState[currentRoom]);
+        if(continents.includes(currentContinent) && occupiedContinents.includes(currentContinent) == false) { // also need to check if current is occupied...
             state = play;
             socket.emit("playGame", {"room": currentRoom.toString(), "continent": currentContinent});
-
         }else {
             alert("Continent already in use!");
         }
@@ -259,8 +254,8 @@ function setup() {
     pressAttack.width = 60;
     pressAttack.height = 60;
     pressAttack.on("click", ()=> {
-        if(continents.includes(targetLocation) && targetLocation != gameState[currentRoom][username]["continent"]) {
-            socket.emit("attack", {"target": targetLocation, "allocated": 300.0, "currentRoomGameState": gameState[currentRoom]});
+        if(continents.includes(targetLocation) && targetLocation != gameState.continent) {
+            socket.emit("attack", {"target": targetLocation, "allocated": 300.0});
         }
     });
     GUI_component.addChild(pressAttack);
@@ -272,7 +267,7 @@ function setup() {
     pressDefend.width = 60;
     pressDefend.height = 60;
     pressDefend.on("click", ()=> {
-        socket.emit("defend", {"allocated": 300.0, "currentRoomGameState": gameState[currentRoom]});
+        socket.emit("defend", {"allocated": 300.0});
     });
     GUI_component.addChild(pressDefend);
 
@@ -452,7 +447,7 @@ function setup() {
                     zoomLevel-=1;
                     break;
                 case 'Tab':
-                    alert(JSON.stringify(gameState[currentRoom]))
+                    alert(JSON.stringify(lobbyState[currentRoom]))
             }
             if(dx >= dxLimit) { dx = dxLimit; }
             if(dx < 0 ) { dx = 0; }
@@ -561,9 +556,9 @@ function play(delta, state) {
 
 /******************************* Game Loop Methods **********************************************************************/
 function updateStats() {
-    gold_magnitude.text = gameState[currentRoom][username]["money"];
-    military_magnitude.text = gameState[currentRoom][username]["troops"];
-    agriculture_magnitude.text = gameState[currentRoom][username]["resources"];
+    gold_magnitude.text = gameState["money"];
+    military_magnitude.text = gameState["troops"];
+    agriculture_magnitude.text = gameState["resources"];
 }
 
 function updateTileSelection(state) {
