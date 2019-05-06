@@ -3,8 +3,9 @@ package MMO.Backend.Classes
 import play.api.libs.json.{JsValue, Json}
 
 abstract class Continent {
-  var Name: String
+  var Name: String  //What is the difference between Name and continentName?
   var continentName: String
+
   var Money: Double = 10000.0
   var Troops: Double = 10000.0
   var Resources: Double = 10000.0
@@ -67,6 +68,7 @@ abstract class Continent {
       "resourceGrowth" -> Json.toJson(this.ResourceGrowth))
     Json.toJson(map)
   }
+
 }
 
 

@@ -10,18 +10,21 @@ case class Attack(targetContinent: String, troopsAllocated: Double)
 case class Defend(troopsAllocated: Double)
 
 class GameActor(username: String) extends Actor {
-  var game: Game = new Game(username, "NorthAmerica") // placeholder
+  //var game: Game = new Game(username, "NorthAmerica") // placeholder
+    var game: Game = new Game()
 
   override def receive: Receive = {
     case setup: Setup =>
-      game = new Game(this.username, setup.continentName)
+      game.playerConnected(this.username, game.createContinent(this.username,setup.continentName))
+
+    //game = new Game(this.username, setup.continentName)
     // setup Database here
     case Update =>
       game.update(System.nanoTime())
-      sender() ! GameState(game.toJson())
+      sender() ! GameState(game.toJson(this.username))
     case attack: Attack =>
-      game.attack(attack.targetContinent, attack.troopsAllocated)
+      game.attack(this.username,attack.targetContinent, attack.troopsAllocated)
     case defend: Defend =>
-      game.defend(defend.troopsAllocated)
+      game.defend(this.username, defend.troopsAllocated)
   }
 }
