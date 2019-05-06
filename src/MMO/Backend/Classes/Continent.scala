@@ -27,11 +27,11 @@ abstract class Continent {
   }
 
   def setupAttack(troopsAllocated: Double) = {
-    if(Money >= pricePerDefense && Resources >= resourcesPerDefense && Troops >= troopsAllocated) { // handles if user has enough troop, resource, troops to defend
+    if(Money >= pricePerAttack && Resources >= resourcesPerAttack && Troops >= troopsAllocated) { // handles if user has enough troop, resource, troops to defend
       Troops -= troopsAllocated
       Resources -= 250
       Money -= 250
-      troopsDefending += troopsAllocated
+      troopsAttacking += troopsAllocated
     }
   }
 

@@ -29,6 +29,9 @@ class Game() {
 //  var lastUpdateTime: Long = System.nanoTime()
 
 
+  val winPercent = .05
+
+
 
   def createContinent(username:String ,choice:String): Continent = {
     var continent:Continent = null
@@ -65,8 +68,34 @@ class Game() {
 
     players(caller).setupAttack(troopsAllocated)
 
-    //continent.setupAttack(troopsAllocated)      #line to be removed
+    val attacker: Continent = players(caller)
+    val defender: Continent = players(selector(target))
+
+    if(attacker.troopsAttacking >= defender.troopsAttacking) {
+      //Maybe we can make an alert system that sends messages to a client
+
+      attacker.Troops += attacker.troopsAttacking
+      attacker.troopsAttacking = 0
+      defender.troopsDefending = 0
+
+      attacker.Money += defender.Money * winPercent
+      attacker.Resources += defender.Resources * winPercent
+
+      defender.Money -= defender.Money * winPercent
+      defender.Resources -= defender.Resources * winPercent
+    }else {
+
+      attacker.troopsAttacking = 0
+
+      defender.Money += attacker.Money * winPercent
+      defender.Resources += attacker.Resources * winPercent
+    }
+
   }
+
+
+
+    //continent.setupAttack(troopsAllocated)      #line to be remove
 
   def defend(caller:String,troopsAllocated: Double): Unit = {
     players(caller).setupDefense(troopsAllocated)
@@ -86,6 +115,18 @@ class Game() {
       //Continent is already taken. I don't know how the server would handle that. Or maybe make it so that it cant be chosen.
     }
   }
+
+  def selector(choice: String): String = { //returns username of the player of the continent chosen
+    val out = ""
+    for (player <- players.keys) {
+      if (choice == players(player).continentName) {
+        return player
+      }
+    }
+    out
+  }
+
+
 }
 
 //import MMO.Backend.Classes.Continent
