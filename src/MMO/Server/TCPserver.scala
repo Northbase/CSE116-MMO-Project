@@ -44,6 +44,9 @@ class TCPserver extends Actor {
 
       if(action == "registered") {
         gameActors += (username -> childActor)
+        gameActors(username) ! Setup("NorthAmerica")
+
+//        this.gameActors.foreach( kv => kv._2 ! Update )
       }else if(action == "disconnected") {
         gameActors(username) ! PoisonPill // kill player's gameActor
         gameActors -= username // remove player from gameActor map

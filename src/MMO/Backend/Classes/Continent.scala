@@ -3,9 +3,8 @@ package MMO.Backend.Classes
 import play.api.libs.json.{JsValue, Json}
 
 abstract class Continent {
-  var Name: String  //What is the difference between Name and continentName?
+  var Name: String
   var continentName: String
-
   var Money: Double = 10000.0
   var Troops: Double = 10000.0
   var Resources: Double = 10000.0
@@ -27,11 +26,11 @@ abstract class Continent {
   }
 
   def setupAttack(troopsAllocated: Double) = {
-    if(Money >= pricePerAttack && Resources >= resourcesPerAttack && Troops >= troopsAllocated) { // handles if user has enough troop, resource, troops to defend
+    if(Money >= pricePerDefense && Resources >= resourcesPerDefense && Troops >= troopsAllocated) { // handles if user has enough troop, resource, troops to defend
       Troops -= troopsAllocated
-      Resources -= 250
-      Money -= 250
-      troopsAttacking += troopsAllocated
+      Resources -= resourcesPerAttack
+      Money -= pricePerAttack
+      troopsDefending += troopsAllocated
     }
   }
 
@@ -39,8 +38,8 @@ abstract class Continent {
   def setupDefense(troopsAllocated : Double) = {
     if(Money >= pricePerDefense && Resources >= resourcesPerDefense && Troops >= troopsAllocated) { // handles if user has enough troop, resource, troops to defend
       Troops -= troopsAllocated
-      Resources -= 500
-      Money -= 500
+      Resources -= resourcesPerDefense
+      Money -= pricePerDefense
       troopsDefending += troopsAllocated
     }
   }
@@ -51,9 +50,9 @@ abstract class Continent {
   }
 
   def update() ={
-//      Money += MoneyGrowth
-//      Troops += TroopGrowth
-//      Resources += ResourceGrowth
+    //      Money += MoneyGrowth
+    //      Troops += TroopGrowth
+    //      Resources += ResourceGrowth
   }
 
   def toJson(): JsValue = {
@@ -68,7 +67,6 @@ abstract class Continent {
       "resourceGrowth" -> Json.toJson(this.ResourceGrowth))
     Json.toJson(map)
   }
-
 }
 
 

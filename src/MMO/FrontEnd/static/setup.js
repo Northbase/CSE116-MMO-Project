@@ -119,6 +119,15 @@ function setup() {
         room.width = 250;
         room.height = 250;
         room.position.set(250 + (roomSerialNumber) * 260, 300);
+
+        var roomSign = new Text();
+        roomSign.style.fill = 0x000000;
+        roomSign.anchor.set(0.5, 0.5);
+        roomSign.position.set(250 + (roomSerialNumber) * 260, 300);
+        roomSign.style.fontSize = 15;
+        roomSign.style.fontFamily = "Times New Roman";
+        roomSign.text = "Room " + roomSerialNumber;
+
         room.on("click", () => {
             currentRoom = roomSerialNumber;
 
@@ -127,6 +136,7 @@ function setup() {
             console.log("ROOM: " + currentRoom);
         });
         ROOM_SELECT_component.addChild(room);
+        ROOM_SELECT_component.addChild(roomSign);
     }
 
     var joinButton = new Sprite(joinButton_rect);
@@ -160,6 +170,15 @@ function setup() {
         continentGrid.width = 150;
         continentGrid.height = 150;
         continentGrid.position.set(180 + continentSerialNumber * 155, 300);
+
+        var continentSign = new Text();
+        continentSign.style.fill = 0x000000;
+        continentSign.anchor.set(0.5, 0.5);
+        continentSign.position.set(180 + continentSerialNumber * 155, 300);
+        continentSign.style.fontSize = 15;
+        continentSign.style.fontFamily = "Times New Roman";
+        continentSign.text = continents[continentSerialNumber];
+
         continentGrid.on("click", () => {
             currentContinent = continents[continentSerialNumber];
 
@@ -168,6 +187,7 @@ function setup() {
             console.log("ROOM: " + roomNumber +" CONTINENT: " +currentContinent);
         });
         CONTINENT_SELECT_component.addChild(continentGrid);
+        CONTINENT_SELECT_component.addChild(continentSign);
     }
 
     var playButton = new Sprite(playButton_rect);
@@ -194,6 +214,14 @@ function setup() {
     profile.width = 90;
     profile.height = 90;
     GUI_component.addChild(profile);
+
+    var profile_text = new Text();
+    profile_text.style.fill = 0x000000;
+    profile_text.style.fontSize = 15;
+    profile_text.style.fontFamily = "Times New Roman";
+    // profile_text.text = currentContinent;
+    profile_text.position.set(GUIborder[0], GUIborder[1]+590);
+    GUI_component.addChild(profile_text);
 
     var gold_stat = new Sprite(gold_stat_rect);
     gold_stat.position.set(GUIborder[0]+100, GUIborder[1]+590);
