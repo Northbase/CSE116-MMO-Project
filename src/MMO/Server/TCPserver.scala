@@ -75,6 +75,7 @@ class TCPserver extends Actor {
       }else if(action == "defend") {
         val allocated: Double = (JSONdata \ "allocated").as[Double]
 
+        
         gameActors(username) ! Defend(allocated)
       }
     case gs: GameState =>
