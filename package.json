@@ -11,8 +11,8 @@
     "websocket": "^1.0.28"
   },
   "devDependencies": {
-    "mocha": "^6.1.4",
-    "spectron": "^5.0.0"
+    "mocha": "^6.2.3",
+    "spectron": "^19.0.0"
   },
   "scripts": {
     "test": "mocha",
